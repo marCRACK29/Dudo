@@ -11,14 +11,16 @@ class Dado:
 
     def __init__(self, generador_numeros=random.randint):
         self._generador = generador_numeros
-        self._ultimo_resultado = Op
+        self._ultimo_resultado = None
     
     def tirar(self) -> int:
-        self._ultimo_resultado = self._generador(1,6)
+        self._ultimo_resultado = self._generador(1,len(self._pintas))
         return self._ultimo_resultado
     
+    @property
     def get_pinta(self) -> str: 
         return self._pintas[self._ultimo_resultado]
     
+    @property
     def ultimo_resultado(self) -> int:
         return self._ultimo_resultado

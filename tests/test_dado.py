@@ -26,7 +26,7 @@ def test_get_pinta(mocker, numero, pinta_esperada):
 
     dado_prueba = Dado(mock_prueba)
     dado_prueba.tirar()
-    resultado = dado_prueba.get_pinta()
+    resultado = dado_prueba.get_pinta
 
     assert resultado == pinta_esperada
 
@@ -39,8 +39,8 @@ def test_ultimo_resultado(mocker, numero_esperado):
     # el valor debe cambiar solo con el método tirar(), get solo debe retornar el último valor
     # hacemos una corta simulación de ello llamando al método 3 veces 
     # (y asi verifcar que no cambie el valor). 
-    dado_prueba.ultimo_resultado()
-    dado_prueba.ultimo_resultado()
-    resultado = dado_prueba.ultimo_resultado()
+    dado_prueba.ultimo_resultado
+    dado_prueba.ultimo_resultado
+    resultado = dado_prueba.ultimo_resultado
 
     assert resultado == numero_esperado
