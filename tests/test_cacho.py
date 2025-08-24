@@ -12,18 +12,21 @@ def test_agitar(mocker):
 
 def test_resultados(mocker):
     resultados_esperados = [1, 2, 3, 4, 5]
-    MockDado = mocker.patch('src.juego.cacho.Dado')
-    dados_mock = []
 
-    for numero in resultados_esperados:
-        dado_mock = mocker.Mock()
-        dado_mock.tirar.return_value = numero
+    MockDado = mocker.patch('src.juego.cacho.Dado')
+
+    # Creamos 5 mocks, cada uno con ultimo_resultado configurado
+    dados_mock = []
+    for valor in resultados_esperados:
+        dado_mock = mocker.Mock() 
+        dado_mock.ultimo_resultado = valor   
         dados_mock.append(dado_mock)
-    
+
     MockDado.side_effect = dados_mock
 
     cacho_prueba = Cacho()
+    cacho_prueba.agitar() # Importante agitar el cacho antes del assert (para generar valores)
     valores_obtenidos = cacho_prueba.resultados()
+
     assert valores_obtenidos == resultados_esperados
 
-       
