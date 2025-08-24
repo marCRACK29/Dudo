@@ -12,7 +12,7 @@ def test_tirar_dado(mocker, numero_esperado):
     assert resultado == numero_esperado
     mock_prueba.assert_called_once_with(1, 6)
 
-@pytest.mark.parametrize("numero", "pinta_esperada", [
+@pytest.mark.parametrize("numero, pinta_esperada", [
     (1, "as"),
     (2, "tonto"), 
     (3, "tren"),
