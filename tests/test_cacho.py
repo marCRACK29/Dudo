@@ -26,7 +26,7 @@ def test_resultados(mocker):
 
     cacho_prueba = Cacho()
     cacho_prueba.agitar() # Importante agitar el cacho antes del assert (para generar valores)
-    valores_obtenidos = cacho_prueba.resultados()
+    valores_obtenidos = cacho_prueba.resultados_numericos
 
     assert valores_obtenidos == resultados_esperados
 
