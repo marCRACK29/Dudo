@@ -2,10 +2,7 @@ from .dado import Dado
 
 class Cacho:
     def __init__(self):
-        self.dados = []
-
-        for _ in range (5):
-            self.dados.append(Dado())
+        self.dados = [Dado() for _ in range(5)]
     
     def agitar(self) -> str:
         for dado in self.dados:
