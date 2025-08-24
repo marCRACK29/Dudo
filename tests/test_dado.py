@@ -44,3 +44,15 @@ def test_ultimo_resultado(mocker, numero_esperado):
     resultado = dado_prueba.ultimo_resultado
 
     assert resultado == numero_esperado
+
+def test_pinta_sin_tirar():
+    dado_prueba = Dado()
+    
+    with pytest.raises(ValueError, match="El dado aún no ha sido tirado."):
+        dado_prueba.get_pinta()
+
+def test_ultimo_resultado_sin_tirar():
+    dado_prueba = Dado()
+    
+    with pytest.raises(ValueError, match="El dado aún no ha sido tirado."):
+        dado_prueba.ultimo_resultado()
