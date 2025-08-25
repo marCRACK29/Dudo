@@ -1,5 +1,4 @@
 import pytest
-from Tools.scripts.stable_abi import ABIItem
 
 from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
 
