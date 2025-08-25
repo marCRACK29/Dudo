@@ -12,9 +12,5 @@ class ArbitroRonda:
 
 
     def siguiente_jugador(self):
-        if self.rotacion == Rotacion.HORARIO:
-            self.jugador_actual_id = (self.jugador_actual_id + 1) % self.cantidad_jugadores
-        else:
-            self.jugador_actual_id = (self.jugador_actual_id - 1) % self.cantidad_jugadores
-
+        self.jugador_actual_id = (self.jugador_actual_id + self.rotacion.value) % self.cantidad_jugadores
 
