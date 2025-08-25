@@ -6,6 +6,11 @@ class Rotacion(Enum):
 
 class ArbitroRonda:
     def __init__(self, primer_jugador_id, cantidad_jugadores, rotacion=Rotacion.HORARIO):
+        if primer_jugador_id < 0:
+            raise ValueError("Jugador inicial invalido")
+        if primer_jugador_id >= cantidad_jugadores:
+            raise ValueError("Jugador inicial superior a cantidad de jugadores")
+
         self.cantidad_jugadores = cantidad_jugadores
         self.jugador_actual_id = primer_jugador_id
         self.rotacion = rotacion
