@@ -16,4 +16,6 @@ class Cacho:
         return [dado.ultimo_resultado for dado in self._dados]
     
     def pierde_dado(self) -> Dado:
-        self._dados.pop()
+        if len(self._dados) > 0:
+            return self._dados.pop()
+        raise ValueError("No quedan dados. Jugador fuera.")
