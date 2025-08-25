@@ -6,7 +6,6 @@ class Rotacion(Enum):
 
 class ArbitroRonda:
     def __init__(self, primer_jugador_id, cantidad_jugadores, rotacion=Rotacion.HORARIO):
-        if
         self.cantidad_jugadores = cantidad_jugadores
         self.jugador_actual_id = primer_jugador_id
         self.rotacion = rotacion
