@@ -46,3 +46,12 @@ def test_gana_dado():
     assert mensaje == "Haz ganado un dado!"
     assert len(cacho_prueba._dados) == 5
 
+def test_limite_superior():
+    cacho_prueba = Cacho() # 5 dados
+    dado = Dado()
+    
+    with pytest.raises(ValueError, match="Límite de 5 dados alcanzado. Dejar dado en depósito del jugador."):
+        cacho_prueba.gana_dado(dado) # Se intentó agregar un sexto dado
+    
+    # Verificar que no se agregó el dado
+    assert len(cacho_prueba._dados) == 5
