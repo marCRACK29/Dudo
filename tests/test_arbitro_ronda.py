@@ -25,7 +25,7 @@ def test_rotacion_jugadores_horaria(inicial,cantidad, esperado):
         (4, 6, 3),
         (0, 2, 1)
     ],
-    ids=["empieza_1","empieza_3","empieza_4", "empieza_0_y_da_vuelta"]
+    ids=["empieza_1","empieza_0","empieza_4", "empieza_0_y_da_vuelta"]
 )
 def test_rotacion_jugadores_antihoraria(inicial,cantidad, esperado):
     arbitro = ArbitroRonda(inicial, cantidad, Rotacion.ANTIHORARIO)

@@ -8,9 +8,13 @@ class ArbitroRonda:
     def __init__(self, first_player_id, cantidad_jugadores, rotacion=Rotacion.HORARIO):
         self.cantidad_jugadores = cantidad_jugadores
         self.jugador_actual_id = first_player_id
+        self.rotacion = rotacion
 
 
     def siguiente_jugador(self):
-        self.jugador_actual_id = (self.jugador_actual_id + 1) % self.cantidad_jugadores
+        if self.rotacion == Rotacion.HORARIO:
+            self.jugador_actual_id = (self.jugador_actual_id + 1) % self.cantidad_jugadores
+        else:
+            self.jugador_actual_id = (self.jugador_actual_id - 1) % self.cantidad_jugadores
 
 
