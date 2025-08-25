@@ -56,15 +56,14 @@ def test_parametros_imposibles(inicial, cantidad, excepcion_str):
 @pytest.mark.parametrize(
     "rotacion_invalida",
     [
-        ("hola mundo"),
-        (5),
-        (-1)
-
+        "hola mundo",
+        5,
+        -1
     ],
     ids=[
-        "string",
-        "int",
-        "float"
+        "instancia incorrecta de string",
+        "instancia incorrecta de int",
+        "instancia incorrecta de float"
     ]
 )
 def test_no_es_rotacion(rotacion_invalida):
