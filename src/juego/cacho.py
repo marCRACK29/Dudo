@@ -21,5 +21,8 @@ class Cacho:
         raise ValueError("No quedan dados. Jugador fuera.")
     
     def gana_dado(self, dado) -> str:
-        self._dados.append(dado)
-        return "Haz ganado un dado!"
+        if len(self._dados) >= 5:
+            raise ValueError("Límite de 5 dados alcanzado. Dejar dado en depósito del jugador.")
+        else:
+            self._dados.append(dado)
+            return "Haz ganado un dado!"
