@@ -1,4 +1,6 @@
 import pytest
+from Tools.scripts.stable_abi import ABIItem
+
 from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
 
 
@@ -27,7 +29,22 @@ def test_rotacion_jugadores_horaria(inicial,cantidad, esperado):
     ],
     ids=["empieza_1","empieza_0","empieza_4", "empieza_0_y_da_vuelta"]
 )
-def test_rotacion_jugadores_antihoraria(inicial,cantidad, esperado):
+def test_rotacion_jugadores_antihoraria(inicial, cantidad, esperado):
     arbitro = ArbitroRonda(inicial, cantidad, Rotacion.ANTIHORARIO)
     arbitro.siguiente_jugador()
     assert arbitro.jugador_actual_id == esperado
+
+@pytest.mark.parametrize(
+    "inicial, cantidad, excepcion_str",
+    [
+        (-2, 2, "Jugador inicial invalido"),
+        (5, 4, "Jugador inicial superior a cantidad de jugadores"),
+        (4, 4, "Jugador inicial superior a cantidad de jugadores"), # se empiezan a contar los jugadores desde el 0
+
+    ]
+)
+def test_parametros_imposibles(inicial, cantidad, excepcion_str):
+    with pytest.raises(ValueError, match=excepcion_str):
+        arbitro = ArbitroRonda(inicial, cantidad)
+
+

@@ -5,9 +5,10 @@ class Rotacion(Enum):
     ANTIHORARIO = -1
 
 class ArbitroRonda:
-    def __init__(self, first_player_id, cantidad_jugadores, rotacion=Rotacion.HORARIO):
+    def __init__(self, primer_jugador_id, cantidad_jugadores, rotacion=Rotacion.HORARIO):
+        if
         self.cantidad_jugadores = cantidad_jugadores
-        self.jugador_actual_id = first_player_id
+        self.jugador_actual_id = primer_jugador_id
         self.rotacion = rotacion
 
 
