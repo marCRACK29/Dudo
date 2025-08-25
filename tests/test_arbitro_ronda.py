@@ -37,10 +37,15 @@ def test_rotacion_jugadores_antihoraria(inicial, cantidad, esperado):
 @pytest.mark.parametrize(
     "inicial, cantidad, excepcion_str",
     [
-        (-2, 2, "Jugador inicial invalido"),
+        (-2, 2, "Jugador inicial negativo"),
         (5, 4, "Jugador inicial superior a cantidad de jugadores"),
         (4, 4, "Jugador inicial superior a cantidad de jugadores"), # se empiezan a contar los jugadores desde el 0
 
+    ],
+    ids=[
+        "Cantidad negativa",
+        "Jugador con id superior a la cantidad",
+        "Jugador con id superior a la cantidad (verificando cantidad igual)"
     ]
 )
 def test_parametros_imposibles(inicial, cantidad, excepcion_str):
