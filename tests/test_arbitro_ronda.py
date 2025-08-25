@@ -53,3 +53,22 @@ def test_parametros_imposibles(inicial, cantidad, excepcion_str):
         arbitro = ArbitroRonda(inicial, cantidad)
 
 
+@pytest.mark.parametrize(
+    "rotacion_invalida",
+    [
+        ("hola mundo"),
+        (5),
+        (-1)
+
+    ],
+    ids=[
+        "string",
+        "int",
+        "float"
+    ]
+)
+def test_no_es_rotacion(rotacion_invalida):
+    with pytest.raises(ValueError, match="Valor dado no es una Rotacion"):
+        arbitro = ArbitroRonda(4,5, rotacion_invalida)
+
+
