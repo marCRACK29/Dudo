@@ -14,3 +14,6 @@ class Cacho:
         if any(dado._ultimo_resultado is None for dado in self._dados):
             raise ValueError("El cacho no se ha agitado todavía.")
         return [dado.ultimo_resultado for dado in self._dados]
+    
+    def pierde_dado(self) -> Dado:
+        self._dados.pop()
