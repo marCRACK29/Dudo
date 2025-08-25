@@ -19,3 +19,7 @@ class Cacho:
         if len(self._dados) > 0:
             return self._dados.pop()
         raise ValueError("No quedan dados. Jugador fuera.")
+    
+    def gana_dado(self, dado) -> str:
+        self._dados.append(dado)
+        return "Haz ganado un dado!"
