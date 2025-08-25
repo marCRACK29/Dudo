@@ -30,3 +30,8 @@ def test_resultados(mocker):
 
     assert valores_obtenidos == resultados_esperados
 
+def test_pierde_dado():
+    cacho_prueba = Cacho() # cacho recien iniciado con sus 5 dados
+    cacho_prueba.pierde_dado() # el método debe quitar solo un dado
+
+    assert len(cacho_prueba._dados) == 4
