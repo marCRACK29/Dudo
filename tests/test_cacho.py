@@ -1,5 +1,6 @@
 import pytest
 from src.juego.cacho import Cacho
+from src.juego.dado import Dado
 
 def test_agitar(mocker):
     mock_tirar = mocker.patch('src.juego.dado.Dado.tirar')
@@ -35,3 +36,13 @@ def test_pierde_dado():
     cacho_prueba.pierde_dado() # el método debe quitar solo un dado
 
     assert len(cacho_prueba._dados) == 4
+
+def test_gana_dado():
+    cacho_prueba = Cacho() # 5 dados
+    cacho_prueba.pierde_dado() # 4 dados
+    dado_prueba = Dado()
+    mensaje = cacho_prueba.gana_dado(dado_prueba) # 5 dados
+
+    assert mensaje == "Haz ganado un dado!"
+    assert len(cacho_prueba._dados) == 5
+
