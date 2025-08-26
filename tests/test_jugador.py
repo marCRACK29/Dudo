@@ -17,3 +17,13 @@ def test_jugador_se_inicializa_con_cacho_y_dados():
     # Verifica que cada elemento en dados es una instancia de Dado.
     for dado in jugador.dados:
         assert isinstance(dado, Dado)
+
+def test_cuantos_dados_tiene_el_jugador():
+    # Asume un jugador con 5 dados al inicio.
+    jugador = Jugador()
+    
+    # El método debe devolver 5.
+    cantidad_dados = jugador.total_de_dados()
+    
+    # Afirma que el resultado es 5.
+    assert cantidad_dados == 5
