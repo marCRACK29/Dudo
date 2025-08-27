@@ -16,8 +16,10 @@ def test_es_numero_valido(validador):
     apuesta_uno = jugador_uno.apuesta_actual
     apuesta_dos = jugador_dos.apuesta_actual
 
-    valido = validador.es_apuesta_valida(apuesta_uno, total_dados=10)
-    invalido = validador.es_apuesta_valida(apuesta_dos, total_dados=10)
+    apuesta_anterior = (0,0) # para este test no es importante la apuesta anterior
+
+    valido = validador.es_apuesta_valida(apuesta_uno, apuesta_anterior,  total_dados=10)
+    invalido = validador.es_apuesta_valida(apuesta_dos, apuesta_anterior, total_dados=10)
 
     assert valido == True
     assert invalido == (False, 'Número inválido')
@@ -27,8 +29,10 @@ def test_cantidad_imposible(validador):
     total_dados = 10
     jugador_uno.realizar_apuesta((11, 4)) # 11 cuadras y hay solo 10 dados
     apuesta = jugador_uno.apuesta_actual
-    invalido = validador.es_apuesta_valida(apuesta, total_dados)
+    apuesta_anterior = (0,0) # para este test no es importante la apuesta anterior
 
+    invalido = validador.es_apuesta_valida(apuesta, apuesta_anterior, total_dados)
+    
     assert invalido == (False, 'Cantidad de dados imposible')
 
 def test_apuesta_respetando_jerarquia_pinta(validador):
@@ -39,10 +43,10 @@ def test_apuesta_respetando_jerarquia_pinta(validador):
     apuesta_uno = jugador_uno.apuesta_actual
     apuesta_dos = jugador_dos.apuesta_actual
     
-    invalido = validador.es_mayor_a_la_anterior_pinta(apuesta_actual=apuesta_dos, apuesta_anterior=apuesta_uno)
-    valido = validador.es_mayor_a_la_anterior_pinta(apuesta_uno, apuesta_dos)
+    invalido = validador.es_apuesta_valida(apuesta_dos, apuesta_anterior=apuesta_uno, total_dados=10)
+    valido = validador.es_apuesta_valida(apuesta_uno, apuesta_dos, total_dados=10)
     
-    assert invalido == False
+    assert invalido == (False, 'No se esta respetando la jerarquía')
     assert valido == True
     
 def test_apuesta_respetando_jerarquia_numero(validador):
@@ -53,9 +57,9 @@ def test_apuesta_respetando_jerarquia_numero(validador):
     apuesta_uno = jugador_uno.apuesta_actual
     apuesta_dos = jugador_dos.apuesta_actual
     
-    invalido = validador.es_mayor_a_la_anterior_num(apuesta_actual=apuesta_dos, apuesta_anterior=apuesta_uno)
-    valido = validador.es_mayor_a_la_anterior_num(apuesta_uno, apuesta_dos)
+    invalido = validador.es_apuesta_valida(apuesta_dos, apuesta_anterior=apuesta_uno, total_dados=10)
+    valido = validador.es_apuesta_valida(apuesta_uno, apuesta_dos, total_dados=10)
     
-    assert invalido == False
+    assert invalido == (False, 'No se esta respetando la jerarquía')
     assert valido == True
     
