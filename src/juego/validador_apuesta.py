@@ -6,3 +6,6 @@ class ValidadorApuesta:
     
     def es_numero_valido(self, apuesta) -> bool:
         return 1 <= apuesta[1] <= 6
+    
+    def es_cantidad_posible(self, apuesta, total_dados) -> bool:
+        return 1 <= apuesta[0] <= total_dados
