@@ -18,4 +18,4 @@ def test_es_numero_valido():
     invalido = validador_prueba.es_apuesta_valida(apuesta_dos)
 
     assert valido == True
-    assert invalido == False
+    assert invalido == (False, 'Número inválido')
