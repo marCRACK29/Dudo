@@ -49,4 +49,16 @@ def test_ganar_un_dado():
 
     # La cantidad de dados debe ser ahora 6, pues puede ganar de a 1 dado
     assert len(jugador.dados) == cantidad_inicial_dados + 1
+
+@pytest.mark.parametrize("cantidad_apuesta, pinta", [
+    (2, 5),    
+    (3, 1),    
+    (6, 6)    
+])
+def test_realizar_una_apuesta(cantidad_apuesta, pinta):
+    jugador = Jugador()
+    apuesta = (cantidad_apuesta, pinta)
     
+    jugador.realizar_apuesta(apuesta)
+    
+    assert jugador.apuesta_actual == apuesta
