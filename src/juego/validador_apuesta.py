@@ -1,20 +1,20 @@
 class ValidadorApuesta:
-    def es_apuesta_valida(self, apuesta, apuesta_anterior, total_dados) -> bool:
-        if not self.es_numero_valido(apuesta):
+    def es_apuesta_valida(self, apuesta, apuesta_anterior, total_dados):
+        if not self._es_numero_valido(apuesta):
             return False, "Número inválido"
-        if not self.es_cantidad_posible(apuesta, total_dados): 
+        if not self._es_cantidad_posible(apuesta, total_dados): 
             return False, "Cantidad de dados imposible"
-        if not self.es_mayor_a_la_anterior(apuesta, apuesta_anterior):
+        if not self._es_mayor_a_la_anterior(apuesta, apuesta_anterior):
             return False, "No se esta respetando la jerarquía"
         return True
     
-    def es_numero_valido(self, apuesta) -> bool:
+    def _es_numero_valido(self, apuesta) -> bool:
         return 1 <= apuesta[1] <= 6
     
-    def es_cantidad_posible(self, apuesta, total_dados) -> bool:
+    def _es_cantidad_posible(self, apuesta, total_dados) -> bool:
         return 1 <= apuesta[0] <= total_dados
     
-    def es_mayor_a_la_anterior(self, apuesta_actual, apuesta_anterior) -> bool: 
+    def _es_mayor_a_la_anterior(self, apuesta_actual, apuesta_anterior) -> bool: 
         if apuesta_actual[1] == apuesta_anterior[1]: # misma pinta 
             return apuesta_actual[0] > apuesta_anterior[0] # los números deben respetar la jerarquia
         else: #pintas distintas
