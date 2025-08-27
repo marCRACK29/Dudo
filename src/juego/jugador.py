@@ -11,3 +11,6 @@ class Jugador:
     
     def perder_dado(self):
         self.dados.pop()
+
+    def ganar_dado(self):
+        self.dados.append(Dado())
