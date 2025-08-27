@@ -11,3 +11,6 @@ class ValidadorApuesta:
     
     def es_cantidad_posible(self, apuesta, total_dados) -> bool:
         return 1 <= apuesta[0] <= total_dados
+
+    def es_mayor_a_la_anterior_pinta(self, apuesta_actual, apuesta_anterior) -> bool:
+        return apuesta_actual[1] > apuesta_anterior[1]

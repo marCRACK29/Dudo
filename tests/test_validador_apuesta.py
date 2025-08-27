@@ -39,9 +39,10 @@ def test_apuesta_respetando_jerarquia_pinta(validador):
     apuesta_uno = jugador_uno.apuesta_actual
     apuesta_dos = jugador_dos.apuesta_actual
     
-    invalido = validador.es_mayor_a_la_anterior_pinta(apuesta_uno, apuesta_dos, total_dados=10)
-    valido = validador.es_mayor_a_la_anterior_pinta(apuesta_dos,apuesta_uno, total_dados=10)
+    invalido = validador.es_mayor_a_la_anterior_pinta(apuesta_actual=apuesta_dos, apuesta_anterior=apuesta_uno)
+    valido = validador.es_mayor_a_la_anterior_pinta(apuesta_uno, apuesta_dos)
     
-    assert valido == True
     assert invalido == False
+    assert valido == True
+    
     
