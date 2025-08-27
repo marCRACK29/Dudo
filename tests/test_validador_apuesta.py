@@ -45,4 +45,17 @@ def test_apuesta_respetando_jerarquia_pinta(validador):
     assert invalido == False
     assert valido == True
     
+def test_apuesta_respetando_jerarquia_numero(validador):
+    jugador_uno = Jugador()
+    jugador_dos = Jugador()
+    jugador_uno.realizar_apuesta((3, 3)) # tres trenes
+    jugador_dos.realizar_apuesta((2, 3)) # dos trenes -> baja de número y eso no se puede 
+    apuesta_uno = jugador_uno.apuesta_actual
+    apuesta_dos = jugador_dos.apuesta_actual
+    
+    invalido = validador.es_mayor_a_la_anterior_num(apuesta_actual=apuesta_dos, apuesta_anterior=apuesta_uno)
+    valido = validador.es_mayor_a_la_anterior_num(apuesta_uno, apuesta_dos)
+    
+    assert invalido == False
+    assert valido == True
     
