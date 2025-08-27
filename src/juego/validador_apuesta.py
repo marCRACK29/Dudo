@@ -14,3 +14,6 @@ class ValidadorApuesta:
 
     def es_mayor_a_la_anterior_pinta(self, apuesta_actual, apuesta_anterior) -> bool:
         return apuesta_actual[1] > apuesta_anterior[1]
+    
+    def es_mayor_a_la_anterior_num(self, apuesta_actual, apuesta_anterior) -> bool:
+        return apuesta_actual[0] > apuesta_anterior[0]
