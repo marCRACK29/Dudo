@@ -5,7 +5,9 @@ class Jugador:
     def __init__(self):
         self.cacho = Cacho()
         self.dados = [Dado() for _ in range(5)]
-        self.cantidad_dados = len(self.dados)
 
     def total_de_dados(self):
-        return self.cantidad_dados
+        return len(self.dados)
+    
+    def perder_dado(self):
+        self.dados.pop()
