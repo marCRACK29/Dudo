@@ -1,5 +1,6 @@
 from src.juego.cacho import Cacho
 from src.juego.dado import Dado
+import random
 
 class Jugador:
     def __init__(self):
@@ -17,5 +18,10 @@ class Jugador:
 
     def realizar_apuesta(self, apuesta_actual):
         self.apuesta_actual = apuesta_actual
-        
+    
+    def elegir_jugador(self, jugadores_disponibles):
+        jugador_elegido = random.choice(jugadores_disponibles)
+
+        return jugador_elegido
+
 
