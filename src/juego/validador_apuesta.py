@@ -1,7 +1,9 @@
 class ValidadorApuesta:
-    def es_apuesta_valida(self, apuesta) -> bool:
+    def es_apuesta_valida(self, apuesta, total_dados) -> bool:
         if not self.es_numero_valido(apuesta):
             return False, "Número inválido"
+        if not self.es_cantidad_posible(apuesta, total_dados): 
+            return False, "Cantidad de dados imposible"
         return True
     
     def es_numero_valido(self, apuesta) -> bool:
