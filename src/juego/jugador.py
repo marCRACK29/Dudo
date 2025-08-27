@@ -14,3 +14,8 @@ class Jugador:
 
     def ganar_dado(self):
         self.dados.append(Dado())
+
+    def realizar_apuesta(self, apuesta_actual):
+        self.apuesta_actual = apuesta_actual
+        
+
