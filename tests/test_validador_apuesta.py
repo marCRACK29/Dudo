@@ -31,3 +31,17 @@ def test_cantidad_imposible(validador):
 
     assert invalido == (False, 'Cantidad de dados imposible')
 
+def test_apuesta_respetando_jerarquia_pinta(validador):
+    jugador_uno = Jugador()
+    jugador_dos = Jugador()
+    jugador_uno.realizar_apuesta((3, 3)) # tres trenes
+    jugador_dos.realizar_apuesta((3, 2)) # tres tontos -> baja de pinta y eso no se puede 
+    apuesta_uno = jugador_uno.apuesta_actual
+    apuesta_dos = jugador_dos.apuesta_actual
+    
+    invalido = validador.es_mayor_a_la_anterior_pinta(apuesta_uno, apuesta_dos, total_dados=10)
+    valido = validador.es_mayor_a_la_anterior_pinta(apuesta_dos,apuesta_uno, total_dados=10)
+    
+    assert valido == True
+    assert invalido == False
+    
