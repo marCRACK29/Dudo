@@ -38,3 +38,15 @@ def test_perder_un_dado():
     
     # La cantidad de dados debe ser ahora 4, pues siempre se pierde de a 1 dado
     assert len(jugador.dados) == cantidad_inicial_dados - 1
+
+def test_ganar_un_dado():
+    # Asumimos que un jugador tiene 5 dados
+    jugador = Jugador()
+    cantidad_inicial_dados = len(jugador.dados)
+
+    # Llamamos al método para ganar un dado
+    jugador.ganar_dado()
+
+    # La cantidad de dados debe ser ahora 6, pues puede ganar de a 1 dado
+    assert len(jugador.dados) == cantidad_inicial_dados + 1
+    
