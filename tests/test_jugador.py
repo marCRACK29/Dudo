@@ -62,3 +62,20 @@ def test_realizar_una_apuesta(cantidad_apuesta, pinta):
     jugador.realizar_apuesta(apuesta)
     
     assert jugador.apuesta_actual == apuesta
+
+def test_elegir_un_jugador_valido(mocker):
+    # Creamos una lista de jugadores simulados
+    jugadores_disponibles = [Jugador(), Jugador(), Jugador()]
+    
+    mocker.patch(
+        'src.juego.jugador.random.choice',
+        return_value=jugadores_disponibles[1]
+    )
+     # Creamos un jugador "activo" para llamar al método
+    jugador_activo = Jugador()
+
+    # Elige un jugador El método interno ahora usará nuestro mock.
+    jugador_elegido = jugador_activo.elegir_jugador(jugadores_disponibles)
+    
+     # Aseguramos que el jugador elegido es el que esperamos (el segundo).
+    assert jugador_elegido == jugadores_disponibles[1]
