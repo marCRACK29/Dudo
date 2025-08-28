@@ -74,13 +74,21 @@ def test_no_es_rotacion(rotacion_invalida):
         arbitro = ArbitroRonda(4,jugadores=jugadores, rotacion=rotacion_invalida)
 
 
+class FakeCacho:
+    def __init__(self, mano):
+        self._mano = list(mano)
+    @property
+    def resultados_numericos(self):
+        return list(self._mano)
+
 def _set_mano(monkeypatch, jugador: Jugador, mano: list[int]):
     """
     Sombrea la property `resultados_numericos` SOLO en la instancia jugador.cacho
     para no depender de `agitar()`. Permite manos distintas por jugador.
     """
-    monkeypatch.setattr(jugador.cacho, "resultados_numericos", list(mano), raising=False)
+    monkeypatch.setattr(jugador, "cacho", FakeCacho(mano))
 
+#Para la estructura de la tupla es (cantidad_a_adivinar, tipo de dado adivinado)
 @pytest.mark.parametrize(
     "manos, adivinanza, esperado",
     [
@@ -119,6 +127,7 @@ def _set_mano(monkeypatch, jugador: Jugador, mano: list[int]):
 def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
     jugadores = [Jugador() for _ in range(len(manos))]
     for j, mano in zip(jugadores, manos):
+        j.cacho.agitar()
         _set_mano(monkeypatch, j, mano)
 
     arbitro = ArbitroRonda(0, jugadores)
