@@ -1,7 +1,7 @@
 import pytest
 
 from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
-
+from src.juego.jugador import Jugador
 
 @pytest.mark.parametrize(
     "inicial, cantidad, esperado",
@@ -14,7 +14,8 @@ from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
     ids=["empieza_1","empieza_3","empieza_4", "empieza_1_y_da_vuelta"]
 )
 def test_rotacion_jugadores_horaria(inicial,cantidad, esperado):
-    arbitro = ArbitroRonda(inicial, cantidad)
+    jugadores = [Jugador() for i in range(cantidad)]
+    arbitro = ArbitroRonda(inicial, jugadores=jugadores)
     arbitro.siguiente_jugador()
     assert arbitro.jugador_actual_id == esperado
 
@@ -29,7 +30,8 @@ def test_rotacion_jugadores_horaria(inicial,cantidad, esperado):
     ids=["empieza_1","empieza_0","empieza_4", "empieza_0_y_da_vuelta"]
 )
 def test_rotacion_jugadores_antihoraria(inicial, cantidad, esperado):
-    arbitro = ArbitroRonda(inicial, cantidad, Rotacion.ANTIHORARIO)
+    jugadores = [Jugador() for i in range(cantidad)]
+    arbitro = ArbitroRonda(inicial, jugadores, Rotacion.ANTIHORARIO)
     arbitro.siguiente_jugador()
     assert arbitro.jugador_actual_id == esperado
 
@@ -48,8 +50,9 @@ def test_rotacion_jugadores_antihoraria(inicial, cantidad, esperado):
     ]
 )
 def test_parametros_imposibles(inicial, cantidad, excepcion_str):
+    jugadores = [Jugador() for i in range(cantidad)]
     with pytest.raises(ValueError, match=excepcion_str):
-        arbitro = ArbitroRonda(inicial, cantidad)
+        arbitro = ArbitroRonda(inicial, jugadores)
 
 
 @pytest.mark.parametrize(
@@ -67,6 +70,7 @@ def test_parametros_imposibles(inicial, cantidad, excepcion_str):
 )
 def test_no_es_rotacion(rotacion_invalida):
     with pytest.raises(ValueError, match="Valor dado no es una Rotacion"):
-        arbitro = ArbitroRonda(4,5, rotacion_invalida)
+        jugadores = [Jugador() for i in range(5)]
+        arbitro = ArbitroRonda(4,jugadores=jugadores, rotacion=rotacion_invalida)
 
 

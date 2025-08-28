@@ -5,7 +5,8 @@ class Rotacion(Enum):
     ANTIHORARIO = -1
 
 class ArbitroRonda:
-    def __init__(self, primer_jugador_id, cantidad_jugadores, rotacion=Rotacion.HORARIO):
+    def __init__(self, primer_jugador_id, jugadores, rotacion=Rotacion.HORARIO):
+        cantidad_jugadores = len(jugadores)
         if primer_jugador_id < 0:
             raise ValueError("Jugador inicial negativo")
         if primer_jugador_id >= cantidad_jugadores:

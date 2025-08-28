@@ -1,11 +1,13 @@
 from src.juego.jugador import Jugador
-
+from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
 class GestorPartida:
 
     def __init__(self, cantidad_jugadores):
         self.jugadores = [Jugador() for i in range(cantidad_jugadores)]
         self._elegir_primer_jugador(cantidad_jugadores)
 
+    def generar_arbitro(self, rotacion):
+        self.arbitro = ArbitroRonda(self.primer_jugador, self.jugadores, rotacion=rotacion)
 
     def _elegir_primer_jugador(self, cantidad_jugadores):
         dados_empate = list(range(0, cantidad_jugadores))
