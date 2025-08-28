@@ -24,4 +24,8 @@ class Jugador:
 
         return jugador_elegido
 
+    def lanzar_un_dado(self):
+        dado = Dado()
+        return dado.tirar()
+
 
