@@ -22,3 +22,6 @@ class ArbitroRonda:
     def siguiente_jugador(self):
         self.jugador_actual_id = (self.jugador_actual_id + self.rotacion.value) % self.cantidad_jugadores
 
+    def definir_ganador(self, adivinanza):
+        pass
+

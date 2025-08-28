@@ -74,3 +74,55 @@ def test_no_es_rotacion(rotacion_invalida):
         arbitro = ArbitroRonda(4,jugadores=jugadores, rotacion=rotacion_invalida)
 
 
+def _set_mano(monkeypatch, jugador: Jugador, mano: list[int]):
+    """
+    Sombrea la property `resultados_numericos` SOLO en la instancia jugador.cacho
+    para no depender de `agitar()`. Permite manos distintas por jugador.
+    """
+    monkeypatch.setattr(jugador.cacho, "resultados_numericos", list(mano), raising=False)
+
+@pytest.mark.parametrize(
+    "manos, adivinanza, esperado",
+    [
+        # Apuesta normal: ases como comodines
+        (
+            [[3, 3, 2, 6, 1], [4, 1, 3, 2, 5]],  # total trenes efectivos: 5
+            (4, 3),
+            True
+        ),
+        # Apuesta a ases: no hay comodín (cuentan solo los 1)
+        (
+            [[1, 3, 1, 6, 2], [4, 1, 3, 2, 5]],  # total ases: 3
+            (3, 1),
+            True
+        ),
+        # Insuficiente: incluso contando comodines no alcanza
+        (
+            [[5, 2, 3, 6, 2], [4, 1, 3, 2, 5]],  # quinas reales 2 + ases 1 = 3
+            (6, 5),
+            False
+        ),
+        # Varios jugadores, mezcla de reales y ases
+        (
+            [[4, 4, 1, 2, 6], [2, 4, 3, 1, 1], [6, 6, 6, 2, 4]],  # cuatros efectivos: (2+1)+(1+2)+(1)=7
+            (5, 4),
+            True
+        ),
+    ],
+    ids=[
+        "apuesta_normal_con_ases_comodin",
+        "apuesta_a_ases_sin_comodin",
+        "apuesta_insuficiente",
+        "varios_jugadores_mezcla"
+    ]
+)
+def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
+    jugadores = [Jugador() for _ in range(len(manos))]
+    for j, mano in zip(jugadores, manos):
+        _set_mano(monkeypatch, j, mano)
+
+    arbitro = ArbitroRonda(0, jugadores)
+    assert arbitro.definir_ganador(adivinanza) is esperado
+
+
+
