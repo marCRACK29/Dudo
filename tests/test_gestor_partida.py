@@ -12,3 +12,15 @@ def test_creacion_jugadores(cantidad_jugadores):
     assert len(jugadores) == cantidad_jugadores
     for jugador in jugadores:
         assert isinstance(jugador, Jugador)
+
+
+def test_seis_jugadores_lanzan_controlado(mocker):
+    # Parchea Dado EN EL MÓDULO donde se usa (jugador.py)
+    MockDado = mocker.patch('src.juego.jugador.Jugador')
+    # Cada llamada a .tirar() devolverá, en orden: 1,2,3,4,5,6
+    MockDado.return_value.tirar.side_effect = [1, 2, 3, 4, 5, 6]
+
+    partida = GestorPartida(6)
+
+
+    assert partida.primer_jugador == 5
