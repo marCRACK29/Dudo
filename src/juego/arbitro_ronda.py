@@ -1,6 +1,5 @@
 from enum import Enum
 
-from setuptools.dist import assert_bool
 
 
 class Rotacion(Enum):
@@ -36,7 +35,6 @@ class ArbitroRonda:
             cantidad_ases += dados_resultados.count(1)
         if adivinanza[1] != 1:
             cantidad_adivinada = cantidad_adivinada + cantidad_ases
-        print(f"La cantidad total es {cantidad_adivinada}")
 
         return cantidad_adivinada >= adivinanza[0]
 

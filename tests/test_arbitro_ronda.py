@@ -126,6 +126,7 @@ def _set_mano(monkeypatch, jugador: Jugador, mano: list[int]):
 )
 def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
     jugadores = [Jugador() for _ in range(len(manos))]
+    # Se simula un resultado de una mano y se le asocia a cada jugador para verificar respuesta correcta de manera determinista
     for j, mano in zip(jugadores, manos):
         j.cacho.agitar()
         _set_mano(monkeypatch, j, mano)
