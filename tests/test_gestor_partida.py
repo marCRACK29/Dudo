@@ -17,14 +17,14 @@ def test_creacion_jugadores(cantidad_jugadores):
     [
         ([1, 2, 3, 4, 5, 6], 5),
         ([1, 2, 3, 4, 6, 6, 6, 1], 4),
-        ([6, 6, 6, 6, 6, 6, 1, 1, 6, 1, 6, 1, 3, 5], 5)
+        ([6, 6, 6, 6, 6, 6, 1, 1, 6, 1, 6, 1, 3, 5], 4)
     ]
 )
 def test_seis_jugadores_lanzan_controlado(mocker, datos_lanzamientos, resultado):
     # Parchea Dado EN EL MÓDULO donde se usa (jugador.py)
-    MockDado = mocker.patch('src.juego.jugador.Jugador')
+    MockDado = mocker.patch('src.juego.gestor_partida.Jugador')
     # Cada llamada a .tirar() devolverá, en orden: 1,2,3,4,5,6
-    MockDado.return_value.tirar.side_effect = datos_lanzamientos
+    MockDado.return_value.lanzar_un_dado.side_effect = datos_lanzamientos
 
     partida = GestorPartida(6)
 
