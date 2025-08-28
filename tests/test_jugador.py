@@ -79,3 +79,13 @@ def test_elegir_un_jugador_valido(mocker):
     
      # Aseguramos que el jugador elegido es el que esperamos (el segundo).
     assert jugador_elegido == jugadores_disponibles[1]
+
+def test_lanzar_dado(mocker):
+    jugador = Jugador()
+
+    MockDado = mocker.patch('src.juego.jugador.Dado')
+    dado_mock = mocker.Mock()
+    dado_mock.tirar.return_value = 6
+    MockDado.return_value = dado_mock
+
+    assert jugador.lanzar_un_dado() == 6
