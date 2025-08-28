@@ -4,7 +4,10 @@ class GestorPartida:
 
     def __init__(self, cantidad_jugadores):
         self.jugadores = [Jugador() for i in range(cantidad_jugadores)]
+        self._elegir_primer_jugador(cantidad_jugadores)
 
+
+    def _elegir_primer_jugador(self, cantidad_jugadores):
         dados_empate = list(range(0, cantidad_jugadores))
 
         while len(dados_empate) != 1:
@@ -19,6 +22,7 @@ class GestorPartida:
                     empates_en_ronda = [dado_id]
             dados_empate = empates_en_ronda
         self.primer_jugador = dados_empate[0]
+
 
 
 
