@@ -55,3 +55,15 @@ def test_limite_superior():
     
     # Verificar que no se agregó el dado
     assert len(cacho_prueba._dados) == 5
+
+def test_dados_actuales():
+    cacho = Cacho()
+
+    assert isinstance(cacho.dados_actuales, list) # verifica que dados_actuales es una lista
+    assert len(cacho._dados) == 5
+    assert len(cacho.dados_actuales) == 5
+
+    for dado in cacho.dados_actuales: # verificq que dados_actuales tenga efectivamente dados del tipo Dado()
+        assert isinstance(dado, Dado)
+    
+    assert cacho.dados_actuales is cacho._dados  # verifica que es la misma lista y no una copia 
