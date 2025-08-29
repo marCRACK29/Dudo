@@ -1,54 +1,77 @@
-
-
 import pytest
 from src.juego.jugador import Jugador
 from src.juego.cacho import Cacho
 from src.juego.dado import Dado
 
-def test_jugador_se_inicializa_con_cacho_y_dados():
-   
-    jugador = Jugador() #aqui creo una instancia de jugador    
+def test_jugador_se_inicializa_correctamente():
+    jugador = Jugador()
     
-    assert isinstance(jugador.cacho, Cacho) #aqui verifico que el jugador tenga un cacho
-
-    assert isinstance(jugador.dados, list) # aqui verifico  que el jugador tenga 5 dados al iniciar la partida
-    assert len(jugador.dados) == 5
+    # 1. Verifica que el jugador tiene un cacho
+    assert isinstance(jugador.cacho, Cacho)
     
-    # Verifica que cada elemento en dados es una instancia de Dado.
-    for dado in jugador.dados:
-        assert isinstance(dado, Dado)
+    # 2. Verifica que la lista de dados calzados está vacía al inicio
+    assert isinstance(jugador.dados_calzados, list)
+    assert len(jugador.dados_calzados) == 0
+    
+    # 3. Verifica que el cacho tiene 5 dados al inicio
+    # Nota: esto asume que tienes una propiedad en Cacho que expone la lista de dados
+    assert len(jugador.cacho.dados_actuales) == 5
 
 def test_cuantos_dados_tiene_el_jugador():
     # Asume un jugador con 5 dados al inicio.
     jugador = Jugador()
-    
-    # El método debe devolver 5.
-    cantidad_dados = jugador.total_de_dados()
-    
-    # Afirma que el resultado es 5.
-    assert cantidad_dados == 5
 
-def test_perder_un_dado():
-    # Asume un jugador con 5 dados
+    assert jugador.total_de_dados_en_juego() == 5
+
+    #simulamos que jugador gana un dado sin utilizar el metodo de ganar dados
+    jugador.dados_calzados.append(Dado())
+
+    #ahora hacemos un assert para verificar que el jugador tiene 6 dados
+    assert jugador.total_de_dados_en_juego() == 6
+ 
+def test_perder_un_dado_de_la_reserva_de_dados():
+    jugador = Jugador() #creamos un jugador con 5 dados
+
+    jugador.dados_calzados.append(Dado()) #agregamos un dado a la lista de dados extra, es decir dados calzados
+
+    jugador.perder_dado() # aplicamos perder dado para que logicamente revise si hay dados extra que pueda eliminar o no
+
+    assert len(jugador.dados_calzados) == 0 #hacemos un assert a la lista de dados extra, que antes tenia uno y ahora debe tener 0 
+    assert len(jugador.cacho.dados_actuales) == 5 #hacemos un assert a la lista de dados del cacho, que antes tenia 5 y deberia tener 5 
+
+def test_perder_un_dado_si_no_hay_dados_extra(mocker):
     jugador = Jugador()
-    cantidad_inicial_dados = len(jugador.dados)
-    
-    # Llama al método para perder un dado
+
+    mocker.patch.object(jugador.cacho, 'pierde_dado')
+
     jugador.perder_dado()
-    
-    # La cantidad de dados debe ser ahora 4, pues siempre se pierde de a 1 dado
-    assert len(jugador.dados) == cantidad_inicial_dados - 1
 
-def test_ganar_un_dado():
-    # Asumimos que un jugador tiene 5 dados
+    jugador.cacho.pierde_dado.assert_called_once()
+
+    assert len(jugador.cacho.dados_actuales) == 5
+
+
+def test_ganar_un_dado_si_hay_dados_extra():
     jugador = Jugador()
-    cantidad_inicial_dados = len(jugador.dados)
 
-    # Llamamos al método para ganar un dado
     jugador.ganar_dado()
 
-    # La cantidad de dados debe ser ahora 6, pues puede ganar de a 1 dado
-    assert len(jugador.dados) == cantidad_inicial_dados + 1
+    assert len(jugador.cacho.dados_actuales) == 5
+    assert len(jugador.dados_calzados) == 1
+
+def test_ganar_dados_si_no_cacho_no_esta_lleno(mocker):
+    jugador = Jugador()
+
+    mocker.patch.object(jugador.cacho, '_dados')
+    jugador.cacho._dados = ([Dado() for _ in range(4)])
+
+    jugador.ganar_dado()
+
+    assert len(jugador.cacho.dados_actuales) == 5
+    assert len(jugador.dados_calzados) == 0
+
+    
+
 
 @pytest.mark.parametrize("cantidad_apuesta, pinta", [
     (2, 5),    
