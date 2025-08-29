@@ -26,3 +26,7 @@ class Cacho:
         else:
             self._dados.append(dado)
             return "Haz ganado un dado!"
+    @property
+    def dados_actuales(self) -> list:
+        """Devuelve la lista de dados que están actualmente en el cacho, no en la lista de dados calzados"""
+        return self._dados
