@@ -157,7 +157,7 @@ def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
     
     mock_definir_ganador = mocker.patch.object(arbitro, 'definir_ganador', return_value=3)
 
-    jugador_actual = arbitro.jugadores[arbitro.jugador_actual_id]
+    
     
     apuesta_anterior = (4, 4)
     arbitro.apuesta_anterior = apuesta_anterior
@@ -167,35 +167,6 @@ def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
 
     mock_definir_ganador.assert_called_once()
     mock_definir_ganador.assert_called_once_with(apuesta_anterior)
-
-   
-
-def test_arbitro_cuando_jugador_hace_calzo_y_la_apuesta_es_correcta(mocker):
-    # Creamos un jugador con un cacho que tiene 4 cuatros
-    jugador_con_dados_fijos = Jugador()
-    jugador_con_dados_fijos.cacho._dados = [mocker.Mock(ultimo_resultado =4 ) for _ in range(4)]
-    
-    # El resto de los jugadores tienen cachos con dados que no son 4
-    jugadores_prueba = [
-        jugador_con_dados_fijos, 
-        Jugador(), 
-        Jugador()
-    ]
-    
-    arbitro = ArbitroRonda(0, jugadores_prueba)
-    
-    # La apuesta anterior es de 4 cuatros
-    apuesta_anterior = (4, 4)
-    arbitro.apuesta_anterior = apuesta_anterior
-    
-    # Mockeamos el metodo definir_ganador para devolver el conteo real de dados
-    mocker.patch.object(arbitro, 'definir_ganador', return_value=4)
-    
-    # Llamamos al método procesar_jugada con CALZO
-    resultado_calzo = arbitro.procesar_jugada(OpcionesJuego.CALZO, None, None)
-
-    # Verificamos que el resultado es True, porque el calzo fue exacto
-    assert resultado_calzo is True
 
 
 @pytest.mark.parametrize(
@@ -257,14 +228,16 @@ def test_arbitro_aplica_regla_calzo_correctamente(
     # Mockeamos el resultado real de los dados para que sea predecible
     mocker.patch.object(arbitro, 'definir_ganador', return_value=dados_reales)
     
-    # Mockeamos los métodos ganar_dado y perder_dado del jugador para espiarlos
-    mock_ganar_dado = mocker.patch.object(jugador_calzador, 'ganar_dado')
-    mock_perder_dado = mocker.patch.object(jugador_calzador, 'perder_dado')
+    jugador_actual = arbitro.jugadores[arbitro.jugador_actual_id]
     
-    # Llamamos al método procesar_jugada
+    
+    mock_ganar_dado = mocker.patch.object(jugador_actual, 'ganar_dado')
+    mock_perder_dado = mocker.patch.object(jugador_actual, 'perder_dado')
+    
+    
     arbitro.procesar_jugada(OpcionesJuego.CALZO, None, None)
     
-    # Verificamos que el método esperado fue llamado una vez
+   
     if metodo_esperado == 'ganar_dado':
         mock_ganar_dado.assert_called_once()
         mock_perder_dado.assert_not_called()

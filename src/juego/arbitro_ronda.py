@@ -44,6 +44,7 @@ class ArbitroRonda:
     
     def procesar_jugada(self, opcion_juego, validador_apuesta, apuesta_actual):
         total_dados_en_juego = len(self.jugadores) * 5
+        jugador_actual = self.jugadores[self.jugador_actual_id]
 
         if opcion_juego == OpcionesJuego.APUESTO:
             validador_apuesta.es_apuesta_valida(
@@ -57,9 +58,6 @@ class ArbitroRonda:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
             dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
             
-            
-            jugador_actual = self.jugadores[self.jugador_actual_id]
-            
             if dudo_fue_correcto:
                 jugador_actual.ganar_dado()
             else:
@@ -67,4 +65,9 @@ class ArbitroRonda:
             
         elif opcion_juego == OpcionesJuego.CALZO:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
-            return cantidad_real == self.apuesta_anterior[0]
+            calzo_fue_correcto = cantidad_real == self.apuesta_anterior[0]
+            
+            if calzo_fue_correcto:
+                jugador_actual.ganar_dado()
+            else:
+                jugador_actual.perder_dado()
