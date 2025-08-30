@@ -54,4 +54,7 @@ class ArbitroRonda:
                 apuesta_anterior,
                 total_dados_en_juego
             )
-        self.apuesta_anterior = apuesta_actual
+            self.apuesta_anterior = apuesta_actual
+
+        elif opcion_juego == OpcionesJuego.DUDO:
+            self.definir_ganador(self.apuesta_anterior)
