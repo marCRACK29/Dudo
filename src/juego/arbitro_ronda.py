@@ -40,7 +40,7 @@ class ArbitroRonda:
         if adivinanza[1] != 1:
             cantidad_adivinada = cantidad_adivinada + cantidad_ases
 
-        return cantidad_adivinada >= adivinanza[0]
+        return cantidad_adivinada 
     
     def procesar_jugada(self, opcion_juego, validador_apuesta, apuesta_actual):
     
