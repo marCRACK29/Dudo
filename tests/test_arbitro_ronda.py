@@ -2,6 +2,7 @@ import pytest
 
 from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
 from src.juego.jugador import Jugador
+from src.juego.validador_apuesta import ValidadorApuesta
 
 @pytest.mark.parametrize(
     "inicial, cantidad, esperado",
@@ -133,6 +134,29 @@ def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
 
     arbitro = ArbitroRonda(0, jugadores)
     assert arbitro.definir_ganador(adivinanza) is esperado
+
+def test_arbitro_valida_apuesta(mocker):
+    
+    jugadores_prueba = [Jugador(), Jugador(), Jugador()]
+    arbitro = ArbitroRonda(0, jugadores_prueba)
+    
+    
+    mock_validador = mocker.Mock(spec = ValidadorApuesta)
+    mock_validador.es_apuesta_valida.return_value = (True, "Apuesta valida")
+    
+    # Aquí simulamos la apuesta del jugador
+    apuesta_simulada = (2, 5) # Dos quinas
+    
+    # Llamamos al método que vamos a crear en ArbitroRonda
+    arbitro.procesar_jugada(OpcionesJuego.APUESTA, mock_validador, apuesta_simulada)
+
+    # Verificamos que el método de validación fue llamado una vez
+    mock_validador.es_apuesta_valida.assert_called_once()
+    
+    # Opcional pero recomendado: Verificamos que fue llamado con los argumentos correctos
+    mock_validador.es_apuesta_valida.assert_called_once_with(
+        apuesta_simulada, None, 15  
+    )
 
 
 
