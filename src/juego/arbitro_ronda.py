@@ -56,13 +56,15 @@ class ArbitroRonda:
         elif opcion_juego == OpcionesJuego.DUDO:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
             dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
+            
+            
+            jugador_actual = self.jugadores[self.jugador_actual_id]
+            
             if dudo_fue_correcto:
-                # El jugador que dudó debe ganar un dado
-                self.jugador_actual.ganar_dado()
+                jugador_actual.ganar_dado()
             else:
-                # El jugador que dudó debe perder un dado
-                self.jugador_actual.perder_dado()
+                jugador_actual.perder_dado()
             
         elif opcion_juego == OpcionesJuego.CALZO:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
-            return cantidad_real == self.apuesta_anterior[0] 
+            return cantidad_real == self.apuesta_anterior[0]
