@@ -1,6 +1,6 @@
 import pytest
 
-from src.juego.arbitro_ronda import ArbitroRonda, Rotacion
+from src.juego.arbitro_ronda import ArbitroRonda, Rotacion, OpcionesJuego
 from src.juego.jugador import Jugador
 from src.juego.validador_apuesta import ValidadorApuesta
 
@@ -148,7 +148,7 @@ def test_arbitro_valida_apuesta(mocker):
     apuesta_simulada = (2, 5) # Dos quinas
     
     # Llamamos al método que vamos a crear en ArbitroRonda
-    arbitro.procesar_jugada(OpcionesJuego.APUESTA, mock_validador, apuesta_simulada)
+    arbitro.procesar_jugada(OpcionesJuego.APUESTO, mock_validador, apuesta_simulada)
 
     # Verificamos que el método de validación fue llamado una vez
     mock_validador.es_apuesta_valida.assert_called_once()

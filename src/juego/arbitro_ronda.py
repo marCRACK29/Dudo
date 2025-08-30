@@ -1,6 +1,9 @@
 from enum import Enum
 
-
+class OpcionesJuego(Enum):
+    DUDO = 1
+    CALZO = 2
+    APUESTO = 3
 
 class Rotacion(Enum):
     HORARIO = 1
@@ -37,4 +40,17 @@ class ArbitroRonda:
             cantidad_adivinada = cantidad_adivinada + cantidad_ases
 
         return cantidad_adivinada >= adivinanza[0]
+    
+    def procesar_jugada(self, opcion_juego, validador_apuesta, apuesta_actual):
+    
+        apuesta_anterior = None 
+        
+        total_dados_en_juego = len(self.jugadores) * 5
+
+        if opcion_juego == OpcionesJuego.APUESTO:
+            validador_apuesta.es_apuesta_valida(
+                apuesta_actual,
+                apuesta_anterior,
+                total_dados_en_juego
+            )
 
