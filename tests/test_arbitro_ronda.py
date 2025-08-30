@@ -96,27 +96,19 @@ def _set_mano(monkeypatch, jugador: Jugador, mano: list[int]):
         # Apuesta normal: ases como comodines
         (
             [[3, 3, 2, 6, 1], [4, 1, 3, 2, 5]],  # total trenes efectivos: 5
-            (4, 3),
-            True
-        ),
+            (4, 3), 5),
         # Apuesta a ases: no hay comodín (cuentan solo los 1)
         (
             [[1, 3, 1, 6, 2], [4, 1, 3, 2, 5]],  # total ases: 3
-            (3, 1),
-            True
-        ),
+            (3, 1), 3),
         # Insuficiente: incluso contando comodines no alcanza
         (
             [[5, 2, 3, 6, 2], [4, 1, 3, 2, 5]],  # quinas reales 2 + ases 1 = 3
-            (6, 5),
-            False
-        ),
+            (6, 5), 3),
         # Varios jugadores, mezcla de reales y ases
         (
             [[4, 4, 1, 2, 6], [2, 4, 3, 1, 1], [6, 6, 6, 2, 4]],  # cuatros efectivos: (2+1)+(1+2)+(1)=7
-            (5, 4),
-            True
-        ),
+            (5, 4), 7),
     ],
     ids=[
         "apuesta_normal_con_ases_comodin",
@@ -133,7 +125,7 @@ def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
         _set_mano(monkeypatch, j, mano)
 
     arbitro = ArbitroRonda(0, jugadores)
-    assert arbitro.definir_ganador(adivinanza) == 5
+    assert arbitro.definir_ganador(adivinanza) == esperado
 
 def test_arbitro_valida_apuesta(mocker):
     
@@ -160,25 +152,21 @@ def test_arbitro_valida_apuesta(mocker):
 
 
 def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
-    
     jugadores_prueba = [Jugador(), Jugador(), Jugador()]
     arbitro = ArbitroRonda(0, jugadores_prueba)
     
-    # Mockeamos el método definir_ganador para poder verificar su llamada
-    mock_definir_ganador = mocker.patch.object(arbitro, 'definir_ganador')
+    # Mockeamos el método definir_ganador y le decimos que devuelva un valor específico
+    mock_definir_ganador = mocker.patch.object(arbitro, 'definir_ganador', return_value=3)
     
-    # El árbitro necesita una apuesta anterior para poder dudar y procesar la jugada
-    apuesta_anterior = (3, 4) 
+    # La apuesta anterior es de 4 cuatros
+    apuesta_anterior = (4, 4)
     arbitro.apuesta_anterior = apuesta_anterior
     
-    # Llamamos al método procesar_jugada con la opción DUDO
-    arbitro.procesar_jugada(OpcionesJuego.DUDO, None, None)
-
-    # Verificamos que el método definir_ganador fue llamado una vez
-    mock_definir_ganador.assert_called_once()
     
-    # Verificamos que fue llamado con la apuesta anterior
+    arbitro.procesar_jugada(OpcionesJuego.DUDO, None, None)
     mock_definir_ganador.assert_called_once_with(apuesta_anterior)
+
+   
 
 def test_arbitro_cuando_jugador_hace_calzo_y_la_apuesta_es_correcta(mocker):
     # Creamos un jugador con un cacho que tiene 4 cuatros
