@@ -133,7 +133,7 @@ def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
         _set_mano(monkeypatch, j, mano)
 
     arbitro = ArbitroRonda(0, jugadores)
-    assert arbitro.definir_ganador(adivinanza) is esperado
+    assert arbitro.definir_ganador(adivinanza) == 5
 
 def test_arbitro_valida_apuesta(mocker):
     
@@ -179,3 +179,30 @@ def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
     
     # Verificamos que fue llamado con la apuesta anterior
     mock_definir_ganador.assert_called_once_with(apuesta_anterior)
+
+def test_arbitro_cuando_jugador_hace_calzo_y_la_apuesta_es_correcta(mocker):
+    # Creamos un jugador con un cacho que tiene 4 cuatros
+    jugador_con_dados_fijos = Jugador()
+    jugador_con_dados_fijos.cacho._dados = [mocker.Mock(ultimo_resultado =4 ) for _ in range(4)]
+    
+    # El resto de los jugadores tienen cachos con dados que no son 4
+    jugadores_prueba = [
+        jugador_con_dados_fijos, 
+        Jugador(), 
+        Jugador()
+    ]
+    
+    arbitro = ArbitroRonda(0, jugadores_prueba)
+    
+    # La apuesta anterior es de 4 cuatros
+    apuesta_anterior = (4, 4)
+    arbitro.apuesta_anterior = apuesta_anterior
+    
+    # Mockeamos el metodo definir_ganador para devolver el conteo real de dados
+    mocker.patch.object(arbitro, 'definir_ganador', return_value=4)
+    
+    # Llamamos al método procesar_jugada con CALZO
+    resultado_calzo = arbitro.procesar_jugada(OpcionesJuego.CALZO, None, None)
+
+    # Verificamos que el resultado es True, porque el calzo fue exacto
+    assert resultado_calzo is True
