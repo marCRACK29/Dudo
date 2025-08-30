@@ -159,4 +159,23 @@ def test_arbitro_valida_apuesta(mocker):
     )
 
 
+def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
+    
+    jugadores_prueba = [Jugador(), Jugador(), Jugador()]
+    arbitro = ArbitroRonda(0, jugadores_prueba)
+    
+    # Mockeamos el método definir_ganador para poder verificar su llamada
+    mock_definir_ganador = mocker.patch.object(arbitro, 'definir_ganador')
+    
+    # El árbitro necesita una apuesta anterior para poder dudar y procesar la jugada
+    apuesta_anterior = (3, 4) 
+    arbitro.apuesta_anterior = apuesta_anterior
+    
+    # Llamamos al método procesar_jugada con la opción DUDO
+    arbitro.procesar_jugada(OpcionesJuego.DUDO, None, None)
 
+    # Verificamos que el método definir_ganador fue llamado una vez
+    mock_definir_ganador.assert_called_once()
+    
+    # Verificamos que fue llamado con la apuesta anterior
+    mock_definir_ganador.assert_called_once_with(apuesta_anterior)
