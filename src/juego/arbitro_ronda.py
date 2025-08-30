@@ -43,18 +43,21 @@ class ArbitroRonda:
         return cantidad_adivinada 
     
     def procesar_jugada(self, opcion_juego, validador_apuesta, apuesta_actual):
-    
-        apuesta_anterior = None 
-        
         total_dados_en_juego = len(self.jugadores) * 5
 
         if opcion_juego == OpcionesJuego.APUESTO:
             validador_apuesta.es_apuesta_valida(
                 apuesta_actual,
-                apuesta_anterior,
+                self.apuesta_anterior, 
                 total_dados_en_juego
             )
             self.apuesta_anterior = apuesta_actual
-
+            # Este método no necesita retornar nada por ahora
+            
         elif opcion_juego == OpcionesJuego.DUDO:
-            self.definir_ganador(self.apuesta_anterior)
+            cantidad_real = self.definir_ganador(self.apuesta_anterior)
+            return cantidad_real < self.apuesta_anterior[0] # Retorna True si la apuesta fue mayor
+            
+        elif opcion_juego == OpcionesJuego.CALZO:
+            cantidad_real = self.definir_ganador(self.apuesta_anterior)
+            return cantidad_real == self.apuesta_anterior[0] # Retorna True si la apuesta fue exacta
