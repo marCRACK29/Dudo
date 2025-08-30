@@ -52,12 +52,17 @@ class ArbitroRonda:
                 total_dados_en_juego
             )
             self.apuesta_anterior = apuesta_actual
-            # Este método no necesita retornar nada por ahora
             
         elif opcion_juego == OpcionesJuego.DUDO:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
-            return cantidad_real < self.apuesta_anterior[0] # Retorna True si la apuesta fue mayor
+            dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
+            if dudo_fue_correcto:
+                # El jugador que dudó debe ganar un dado
+                self.jugador_actual.ganar_dado()
+            else:
+                # El jugador que dudó debe perder un dado
+                self.jugador_actual.perder_dado()
             
         elif opcion_juego == OpcionesJuego.CALZO:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
-            return cantidad_real == self.apuesta_anterior[0] # Retorna True si la apuesta fue exacta
+            return cantidad_real == self.apuesta_anterior[0] 
