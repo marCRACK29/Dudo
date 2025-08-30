@@ -229,3 +229,45 @@ def test_arbitro_aplica_regla_dudo_correctamente(
     else:
         mock_perder_dado.assert_called_once()
         mock_ganar_dado.assert_not_called()
+
+
+   
+@pytest.mark.parametrize(
+    "dados_reales, apuesta_calzo, metodo_esperado",
+    [
+        # Escenario 1: Calzo correcto (hay 4 dados, se apostó 4)
+        # El jugador que calzó gana un dado
+        (4, (4, 5), 'ganar_dado'),
+        
+        # Escenario 2: Calzo incorrecto (hay 5 dados, se apostó 4)
+        # El jugador que calzó pierde un dado
+        (5, (4, 5), 'perder_dado')
+    ]
+)
+def test_arbitro_aplica_regla_calzo_correctamente(
+    dados_reales, apuesta_calzo, metodo_esperado, mocker
+):
+    # Creamos un árbitro con un jugador de prueba
+    jugador_calzador = Jugador()
+    arbitro = ArbitroRonda(0, [jugador_calzador])
+    
+    # Configuramos la apuesta anterior
+    arbitro.apuesta_anterior = apuesta_calzo
+    
+    # Mockeamos el resultado real de los dados para que sea predecible
+    mocker.patch.object(arbitro, 'definir_ganador', return_value=dados_reales)
+    
+    # Mockeamos los métodos ganar_dado y perder_dado del jugador para espiarlos
+    mock_ganar_dado = mocker.patch.object(jugador_calzador, 'ganar_dado')
+    mock_perder_dado = mocker.patch.object(jugador_calzador, 'perder_dado')
+    
+    # Llamamos al método procesar_jugada
+    arbitro.procesar_jugada(OpcionesJuego.CALZO, None, None)
+    
+    # Verificamos que el método esperado fue llamado una vez
+    if metodo_esperado == 'ganar_dado':
+        mock_ganar_dado.assert_called_once()
+        mock_perder_dado.assert_not_called()
+    else:
+        mock_perder_dado.assert_called_once()
+        mock_ganar_dado.assert_not_called()
