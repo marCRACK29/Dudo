@@ -23,6 +23,7 @@ class ArbitroRonda:
         self.jugador_actual_id = primer_jugador_id
         self.rotacion = rotacion
         self.jugadores = jugadores
+        self.apuesta_anterior = None
 
 
     def siguiente_jugador(self):
@@ -53,4 +54,4 @@ class ArbitroRonda:
                 apuesta_anterior,
                 total_dados_en_juego
             )
-
+        self.apuesta_anterior = apuesta_actual
