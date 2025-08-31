@@ -46,10 +46,16 @@ class ArbitroRonda:
 
         return cantidad_adivinada 
     
+    def _setear_inicio_ronda(self, jugador):
+        if jugador not in self.jugadores:
+            raise ValueError("El jugador no pertenece a esta ronda")
+        self.jugador_actual_id = self.jugadores.index(jugador)
+
     def procesar_jugada(self, opcion_juego, apuesta_actual):
         validador_apuesta = ValidadorApuesta()
-        total_dados_en_juego = len(self.jugadores) * 5
+        total_dados_en_juego = sum(jugador.total_de_dados_en_juego() for jugador in self.jugadores)
         jugador_actual = self.jugadores[self.jugador_actual_id]
+        jugador_anterior = self.jugadores[(self.jugador_actual_id - self.rotacion.value) % len(self.jugadores)]
 
         if opcion_juego == OpcionesJuego.APUESTO:
             validador_apuesta.es_apuesta_valida(
@@ -64,9 +70,11 @@ class ArbitroRonda:
             dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
             
             if dudo_fue_correcto:
-                jugador_actual.ganar_dado()
+                jugador_anterior.perder_dado()
+                self._setear_inicio_ronda(jugador_anterior)
             else:
                 jugador_actual.perder_dado()
+                self._setear_inicio_ronda(jugador_actual)
             
         elif opcion_juego == OpcionesJuego.CALZO:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
@@ -74,5 +82,7 @@ class ArbitroRonda:
             
             if calzo_fue_correcto:
                 jugador_actual.ganar_dado()
+                self._setear_inicio_ronda(jugador_actual)
             else:
                 jugador_actual.perder_dado()
+                self._setear_inicio_ronda(jugador_actual)
