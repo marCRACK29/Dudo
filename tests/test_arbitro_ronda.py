@@ -96,19 +96,27 @@ def _set_mano(monkeypatch, jugador: Jugador, mano: list[int]):
         # Apuesta normal: ases como comodines
         (
             [[3, 3, 2, 6, 1], [4, 1, 3, 2, 5]],  # total trenes efectivos: 5
-            (4, 3), 5),
+            (4, 3),
+            5
+        ),
         # Apuesta a ases: no hay comodín (cuentan solo los 1)
         (
             [[1, 3, 1, 6, 2], [4, 1, 3, 2, 5]],  # total ases: 3
-            (3, 1), 3),
+            (3, 1),
+            3
+        ),
         # Insuficiente: incluso contando comodines no alcanza
         (
             [[5, 2, 3, 6, 2], [4, 1, 3, 2, 5]],  # quinas reales 2 + ases 1 = 3
-            (6, 5), 3),
+            (6, 5),
+            3
+        ),
         # Varios jugadores, mezcla de reales y ases
         (
             [[4, 4, 1, 2, 6], [2, 4, 3, 1, 1], [6, 6, 6, 2, 4]],  # cuatros efectivos: (2+1)+(1+2)+(1)=7
-            (5, 4), 7),
+            (5, 4),
+            7
+        ),
     ],
     ids=[
         "apuesta_normal_con_ases_comodin",
