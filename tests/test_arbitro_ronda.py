@@ -247,6 +247,6 @@ def test_setear_jugador_prox_ronda():
     arbitro = ArbitroRonda(0, jugadores) # comenzamos con el primer jugador de la lista
 
     jugador_objetivo = jugadores[2] #tomamos el tercero y comenzamos la siguiente ronda desde aquí 
-    arbitro.setear_inicio_ronda(jugador_objetivo)
+    arbitro._setear_inicio_ronda(jugador_objetivo)
 
     assert arbitro.jugador_actual_id == 2
