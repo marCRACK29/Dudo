@@ -64,7 +64,7 @@ def _set_mano(jugador, mano):
             # resultado = (ganador_id, perdedor_id)
             # Con estas manos: quinas=2 (J1 y J2) + ases=2 (J0 y J1 cuando cara!=1) => total=4
             # Apuesta anterior fue (3,5) -> DUDO es INCORRECTO si total >= 3, por lo tanto J2 pierde un dado
-            2,
+            [5, 5, 4],
         ),
         # Caso B: J0 apuesta (1,1) -> J1 CALZO
         (
@@ -75,7 +75,7 @@ def _set_mano(jugador, mano):
                 (OpcionesJuego.CALZO, None),
             ],
             # Contar 1s exactos = 3; calzo con apuesta=1 es INCORRECTO, J1 pierde un dado
-            1,
+            [5, 4],
         ),
     ],
     ids=[
@@ -108,20 +108,16 @@ def test_jugar_ronda(monkeypatch, manos, llamadas_esperadas, resultado):
         _set_mano(j, mano)
 
     # 5) Construir proveedores: todos comparten la MISMA cola secuencial
-    proveedores = [ProveedorScripted(llamadas_esperadas) for _ in range(num_jugadores)]
+    proveedor = ProveedorScripted(llamadas_esperadas)
 
     # 6) Snapshot de dados antes
     antes = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
 
     # 7) Ejecutar la ronda
-    partida.jugar_ronda(proveedores)
+    partida.jugar_ronda(proveedor)
 
     # 8) Snapshot de dados después y detectar quién empieza la próxima ronda
     despues = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
-    deltas = [d - a for d, a in zip(despues, antes)]
 
-    # En tu implementación actual, solo cambia 1 jugador (gana o pierde un dado)
-    # Ese es quien comienza la próxima ronda.
-    starter_id = next((i for i, d in enumerate(deltas) if d != 0), None)
 
-    assert starter_id == resultado
+    assert despues == resultado

@@ -10,7 +10,14 @@ class GestorPartida:
         self.arbitro = ArbitroRonda(self.primer_jugador, self.jugadores, rotacion=rotacion)
 
     def jugar_ronda(self, proveedor_desiciones):
-        pass
+        while True:
+            decision, apuesta = proveedor_desiciones.decidir()
+            self.arbitro.procesar_jugada(decision, apuesta)
+            if apuesta is None:
+                break
+            self.arbitro.siguiente_jugador()
+
+
 
     def _elegir_primer_jugador(self, cantidad_jugadores):
         dados_empate = list(range(0, cantidad_jugadores))
