@@ -50,6 +50,7 @@ class ArbitroRonda:
         validador_apuesta = ValidadorApuesta()
         total_dados_en_juego = len(self.jugadores) * 5
         jugador_actual = self.jugadores[self.jugador_actual_id]
+        jugador_anterior = self.jugadores[(self.jugador_actual_id - self.rotacion.value) % len(self.jugadores)]
 
         if opcion_juego == OpcionesJuego.APUESTO:
             validador_apuesta.es_apuesta_valida(
@@ -64,7 +65,7 @@ class ArbitroRonda:
             dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
             
             if dudo_fue_correcto:
-                jugador_actual.ganar_dado()
+                jugador_anterior.perder_dado()
             else:
                 jugador_actual.perder_dado()
             

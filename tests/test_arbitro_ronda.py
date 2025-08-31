@@ -170,36 +170,34 @@ def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
 
 
 @pytest.mark.parametrize(
-    "dados_reales, apuesta_duda, metodo_esperado",
+    "dados_reales, apuesta_duda, pierde_actual",
     [
-        (3, (4, 5), 'ganar_dado'),
-        (5, (4, 5), 'perder_dado')
+        (3, (4, 5), False), # Dudo correcto -> pierde el anterior
+        (5, (4, 5), True) # Dudo incorrecto -> pierde el actual
     ]
 )
-def test_arbitro_aplica_regla_dudo_correctamente(
-    dados_reales, apuesta_duda, metodo_esperado, mocker
-):
-    jugador_de_prueba = Jugador()
-    arbitro = ArbitroRonda(0, [jugador_de_prueba])
+def test_arbitro_aplica_regla_dudo_correctamente(dados_reales, apuesta_duda, pierde_actual, mocker):
+    jugadores = [Jugador(), Jugador()]
+    arbitro = ArbitroRonda(0, jugadores)
     
     arbitro.apuesta_anterior = apuesta_duda
     
     mocker.patch.object(arbitro, 'definir_ganador', return_value=dados_reales)
     
-    # La corrección clave está en esta línea, la única que debe haber.
     jugador_actual = arbitro.jugadores[arbitro.jugador_actual_id]
+    jugador_anterior = arbitro.jugadores[(arbitro.jugador_actual_id - arbitro.rotacion.value) % len(arbitro.jugadores)]
     
-    mock_ganar_dado = mocker.patch.object(jugador_actual, 'ganar_dado')
-    mock_perder_dado = mocker.patch.object(jugador_actual, 'perder_dado')
+    mock_perder_actual = mocker.patch.object(jugador_actual, 'perder_dado')
+    mock_perder_anterior = mocker.patch.object(jugador_anterior, 'perder_dado')
 
     arbitro.procesar_jugada(OpcionesJuego.DUDO, None)
     
-    if metodo_esperado == 'ganar_dado':
-        mock_ganar_dado.assert_called_once()
-        mock_perder_dado.assert_not_called()
+    if pierde_actual:
+        mock_perder_actual.assert_called_once()
+        mock_perder_anterior.assert_not_called()
     else:
-        mock_perder_dado.assert_called_once()
-        mock_ganar_dado.assert_not_called()
+        mock_perder_anterior.assert_called_once()
+        mock_perder_actual.assert_not_called()
 
 
    
