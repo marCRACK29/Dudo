@@ -128,26 +128,26 @@ def test_definir_ganador(manos, adivinanza, esperado, monkeypatch):
     assert arbitro.definir_ganador(adivinanza) == esperado
 
 def test_arbitro_valida_apuesta(mocker):
-    
     jugadores_prueba = [Jugador(), Jugador(), Jugador()]
     arbitro = ArbitroRonda(0, jugadores_prueba)
-    
-    
-    mock_validador = mocker.Mock(spec = ValidadorApuesta)
-    mock_validador.es_apuesta_valida.return_value = (True, "Apuesta valida")
-    
-    # Aquí simulamos la apuesta del jugador
-    apuesta_simulada = (2, 5) # Dos quinas
-    
-    # Llamamos al método que vamos a crear en ArbitroRonda
-    arbitro.procesar_jugada(OpcionesJuego.APUESTO, mock_validador, apuesta_simulada)
 
-    # Verificamos que el método de validación fue llamado una vez
-    mock_validador.es_apuesta_valida.assert_called_once()
-    
-    # Opcional pero recomendado: Verificamos que fue llamado con los argumentos correctos
-    mock_validador.es_apuesta_valida.assert_called_once_with(
-        apuesta_simulada, None, 15  
+    # Parcheamos ValidadorApuesta en el módulo donde ArbitroRonda lo usa
+    mock_validador_cls = mocker.patch(
+        "src.juego.arbitro_ronda.ValidadorApuesta"
+    )
+    # Creamos un mock para la instancia de esa clase
+    mock_validador_inst = mock_validador_cls.return_value
+    mock_validador_inst.es_apuesta_valida.return_value = (True, "Apuesta válida")
+
+    # Apuesta simulada
+    apuesta_simulada = (2, 5)  # Dos quinas
+
+    # Ejecutamos el método
+    arbitro.procesar_jugada(OpcionesJuego.APUESTO, apuesta_simulada)
+
+    # Verificamos que es_apuesta_valida se llamó correctamente
+    mock_validador_inst.es_apuesta_valida.assert_called_once_with(
+        apuesta_simulada, None, 15
     )
 
 
@@ -163,7 +163,7 @@ def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
     arbitro.apuesta_anterior = apuesta_anterior
     
     # Aquí se corrige el problema. El método procesar_jugada recibe el jugador actual del arbitro.
-    arbitro.procesar_jugada(OpcionesJuego.DUDO, None, None)
+    arbitro.procesar_jugada(OpcionesJuego.DUDO, None)
 
     mock_definir_ganador.assert_called_once()
     mock_definir_ganador.assert_called_once_with(apuesta_anterior)
@@ -191,8 +191,8 @@ def test_arbitro_aplica_regla_dudo_correctamente(
     
     mock_ganar_dado = mocker.patch.object(jugador_actual, 'ganar_dado')
     mock_perder_dado = mocker.patch.object(jugador_actual, 'perder_dado')
-    
-    arbitro.procesar_jugada(OpcionesJuego.DUDO, None, None)
+
+    arbitro.procesar_jugada(OpcionesJuego.DUDO, None)
     
     if metodo_esperado == 'ganar_dado':
         mock_ganar_dado.assert_called_once()
@@ -233,9 +233,8 @@ def test_arbitro_aplica_regla_calzo_correctamente(
     
     mock_ganar_dado = mocker.patch.object(jugador_actual, 'ganar_dado')
     mock_perder_dado = mocker.patch.object(jugador_actual, 'perder_dado')
-    
-    
-    arbitro.procesar_jugada(OpcionesJuego.CALZO, None, None)
+
+    arbitro.procesar_jugada(OpcionesJuego.CALZO, None)
     
    
     if metodo_esperado == 'ganar_dado':

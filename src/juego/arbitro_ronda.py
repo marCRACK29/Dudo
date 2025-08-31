@@ -1,5 +1,9 @@
 from enum import Enum
 
+from src.juego.validador_apuesta import ValidadorApuesta
+from tests.test_validador_apuesta import validador
+
+
 class OpcionesJuego(Enum):
     DUDO = 1
     CALZO = 2
@@ -42,7 +46,8 @@ class ArbitroRonda:
 
         return cantidad_adivinada 
     
-    def procesar_jugada(self, opcion_juego, validador_apuesta, apuesta_actual):
+    def procesar_jugada(self, opcion_juego, apuesta_actual):
+        validador_apuesta = ValidadorApuesta()
         total_dados_en_juego = len(self.jugadores) * 5
         jugador_actual = self.jugadores[self.jugador_actual_id]
 
