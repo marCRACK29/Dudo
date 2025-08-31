@@ -16,18 +16,6 @@ def test_jugador_se_inicializa_correctamente():
     # 3. Verifica que el cacho tiene 5 dados al inicio
     # Nota: esto asume que tienes una propiedad en Cacho que expone la lista de dados
     assert len(jugador.cacho.dados_actuales) == 5
-
-def test_cuantos_dados_tiene_el_jugador():
-    # Asume un jugador con 5 dados al inicio.
-    jugador = Jugador()
-
-    assert jugador.total_de_dados_en_juego() == 5
-
-    #simulamos que jugador gana un dado sin utilizar el metodo de ganar dados
-    jugador.dados_calzados.append(Dado())
-
-    #ahora hacemos un assert para verificar que el jugador tiene 6 dados
-    assert jugador.total_de_dados_en_juego() == 6
  
 def test_perder_un_dado_de_la_reserva_de_dados():
     jugador = Jugador() #creamos un jugador con 5 dados

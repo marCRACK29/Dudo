@@ -53,7 +53,7 @@ class ArbitroRonda:
 
     def procesar_jugada(self, opcion_juego, apuesta_actual):
         validador_apuesta = ValidadorApuesta()
-        total_dados_en_juego = len(self.jugadores) * 5
+        total_dados_en_juego = sum(jugador.total_de_dados_en_juego() for jugador in self.jugadores)
         jugador_actual = self.jugadores[self.jugador_actual_id]
         jugador_anterior = self.jugadores[(self.jugador_actual_id - self.rotacion.value) % len(self.jugadores)]
 

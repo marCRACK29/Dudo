@@ -9,7 +9,7 @@ class Jugador:
         self.apuesta_actual = None
 
     def total_de_dados_en_juego(self):
-        return len(self.dados_calzados) + len(self.cacho.dados_actuales)
+        return len(self.cacho.dados_actuales)
     
     def perder_dado(self):
         if len(self.dados_calzados) > 0:
