@@ -46,6 +46,11 @@ class ArbitroRonda:
 
         return cantidad_adivinada 
     
+    def setear_inicio_ronda(self, jugador):
+        if jugador not in self.jugadores:
+            raise ValueError("El jugador no pertenece a esta ronda")
+        self.jugador_actual_id = self.jugadores.index(jugador)
+
     def procesar_jugada(self, opcion_juego, apuesta_actual):
         validador_apuesta = ValidadorApuesta()
         total_dados_en_juego = len(self.jugadores) * 5
