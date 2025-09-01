@@ -14,7 +14,7 @@ class Dado:
         self._ultimo_resultado = None
     
     def tirar(self) -> int:
-        self._ultimo_resultado = self._generador(1,len(self._pintas))
+        self._ultimo_resultado = self._generador(1, len(self._pintas))
         return self._ultimo_resultado
     
     @property

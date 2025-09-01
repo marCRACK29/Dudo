@@ -2,21 +2,21 @@ from src.juego.jugador import Jugador
 from src.juego.arbitro_ronda import ArbitroRonda, Rotacion, OpcionesJuego
 class GestorPartida:
 
-    def __init__(self, cantidad_jugadores):
+    def __init__(self, cantidad_jugadores: int):
         self.jugadores = [Jugador() for i in range(cantidad_jugadores)]
         self._elegir_primer_jugador(cantidad_jugadores)
 
-    def generar_arbitro(self, rotacion):
+    def generar_arbitro(self, rotacion: Rotacion):
         self.arbitro = ArbitroRonda(self.primer_jugador, self.jugadores, rotacion=rotacion)
 
-    def jugar_ronda(self, proveedor_desiciones):
+    def jugar_ronda(self, proveedor_desiciones: "Clase desicion"):
         while True:
             decision, apuesta = proveedor_desiciones.decidir()
             self.arbitro.procesar_jugada(decision, apuesta)
             if apuesta is None:
                 break
 
-    def _elegir_primer_jugador(self, cantidad_jugadores):
+    def _elegir_primer_jugador(self, cantidad_jugadores: int):
         dados_empate = list(range(0, cantidad_jugadores))
 
         while len(dados_empate) != 1:
