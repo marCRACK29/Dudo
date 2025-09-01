@@ -1,6 +1,7 @@
 from enum import Enum
-
+from typing import Optional, Tuple
 from src.juego.validador_apuesta import ValidadorApuesta
+from src.juego.jugador import Jugador
 
 class OpcionesJuego(Enum):
     DUDO = 1
@@ -12,7 +13,8 @@ class Rotacion(Enum):
     ANTIHORARIO = -1
 
 class ArbitroRonda:
-    def __init__(self, primer_jugador_id, jugadores, rotacion=Rotacion.HORARIO):
+    def __init__(self, primer_jugador_id: int, jugadores: list[Jugador],
+                 rotacion: Rotacion = Rotacion.HORARIO):
         cantidad_jugadores = len(jugadores)
         if primer_jugador_id < 0:
             raise ValueError("Jugador inicial negativo")
@@ -30,7 +32,7 @@ class ArbitroRonda:
     def _siguiente_jugador(self):
         self.jugador_actual_id = (self.jugador_actual_id + self.rotacion.value) % self.cantidad_jugadores
 
-    def definir_ganador(self, adivinanza):
+    def definir_ganador(self, adivinanza: Tuple[int, int]) -> int:
         cantidad_adivinada = 0
         cantidad_ases = 0
         for jugador in self.jugadores:
@@ -43,12 +45,12 @@ class ArbitroRonda:
 
         return cantidad_adivinada
 
-    def _setear_inicio_ronda(self, jugador):
+    def _setear_inicio_ronda(self, jugador: Jugador):
         if jugador not in self.jugadores:
             raise ValueError("El jugador no pertenece a esta ronda")
         self.jugador_actual_id = self.jugadores.index(jugador)
 
-    def procesar_jugada(self, opcion_juego, apuesta_actual):
+    def procesar_jugada(self, opcion_juego: OpcionesJuego, apuesta_actual: Tuple[int, int]):
         validador_apuesta = ValidadorApuesta()
         total_dados_en_juego = sum(jugador.total_de_dados_en_juego() for jugador in self.jugadores)
         jugador_actual = self.jugadores[self.jugador_actual_id]
@@ -67,7 +69,7 @@ class ArbitroRonda:
         jugador_actual = self.jugadores[self.jugador_actual_id]
         return jugador_actual.total_de_dados_en_juego() == 1
 
-    def _resolver_calzo(self, jugador_actual):
+    def _resolver_calzo(self, jugador_actual: Jugador):
         cantidad_real = self.definir_ganador(self.apuesta_anterior)
         calzo_fue_correcto = cantidad_real == self.apuesta_anterior[0]
         if calzo_fue_correcto:
@@ -77,7 +79,7 @@ class ArbitroRonda:
             jugador_actual.perder_dado()
             self._setear_inicio_ronda(jugador_actual)
 
-    def _resolver_dudo(self, jugador_actual, jugador_anterior):
+    def _resolver_dudo(self, jugador_actual: Jugador, jugador_anterior: Jugador):
         cantidad_real = self.definir_ganador(self.apuesta_anterior)
         dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
         if dudo_fue_correcto:
@@ -87,8 +89,8 @@ class ArbitroRonda:
             jugador_actual.perder_dado()
             self._setear_inicio_ronda(jugador_actual)
 
-
-    def _validar_resolver_apuesta(self, apuesta_actual, total_dados_en_juego, validador_apuesta):
+    def _validar_resolver_apuesta(self, apuesta_actual: Tuple[int, int], total_dados_en_juego: int,
+                                  validador_apuesta: ValidadorApuesta):
         es_valido, msg = validador_apuesta.es_apuesta_valida(
             apuesta_actual,
             self.apuesta_anterior,
