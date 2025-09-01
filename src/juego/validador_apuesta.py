@@ -6,7 +6,7 @@ class ValidadorApuesta:
             return False, "Cantidad de dados imposible"
         if not self._es_mayor_a_la_anterior(apuesta, apuesta_anterior):
             return False, "No se esta respetando la jerarquía"
-        return True
+        return True, "OK"
     
     def _es_numero_valido(self, apuesta) -> bool:
         return 1 <= apuesta[1] <= 6

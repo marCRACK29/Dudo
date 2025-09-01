@@ -15,9 +15,6 @@ class GestorPartida:
             self.arbitro.procesar_jugada(decision, apuesta)
             if apuesta is None:
                 break
-            self.arbitro.siguiente_jugador()
-
-
 
     def _elegir_primer_jugador(self, cantidad_jugadores):
         dados_empate = list(range(0, cantidad_jugadores))
@@ -34,7 +31,3 @@ class GestorPartida:
                     empates_en_ronda = [dado_id]
             dados_empate = empates_en_ronda
         self.primer_jugador = dados_empate[0]
-
-
-
-
