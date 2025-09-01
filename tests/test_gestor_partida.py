@@ -118,3 +118,18 @@ def test_jugar_ronda(monkeypatch, manos, llamadas_esperadas, resultado):
 
 
     assert despues == resultado
+
+def test_eliminar_jugador_sin_dados():
+    partida = GestorPartida(3)
+    
+    # Forzamos un jugador sin dados
+    jugador_a_eliminar = partida.jugadores[0]
+    for _ in range(5):
+        jugador_a_eliminar.perder_dado()  # se queda sin dados
+    
+    # Ejecutamos limpieza
+    partida._eliminar_jugadores_sin_dados()
+    
+    # Debe haber solo 2 jugadores ahora
+    assert len(partida.jugadores) == 2
+    assert jugador_a_eliminar not in partida.jugadores
