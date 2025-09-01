@@ -86,3 +86,6 @@ class ArbitroRonda:
             else:
                 jugador_actual.perder_dado()
                 self._setear_inicio_ronda(jugador_actual)
+    def es_jugador_con_un_dado(self):
+        jugador_actual = self.jugadores[self.jugador_actual_id]
+        return jugador_actual.total_de_dados_en_juego() == 1
