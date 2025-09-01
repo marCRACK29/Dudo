@@ -287,3 +287,24 @@ def test_arbitro_verifica_si_jugador_tiene_un_dado(
     
     # Verificamos que el resultado es el que esperamos
     assert resultado == es_jugador_con_un_dado_esperado
+
+def test_arbitro_asigna_primer_turno_a_jugador_con_un_dado(mocker):
+    # Creamos dos jugadores, uno con 5 dados y el otro con 1
+    jugador_con_muchos_dados = Jugador()
+    jugador_con_un_dado = Jugador()
+    
+    # Mockeamos el conteo de dados para simular el escenario
+    mocker.patch.object(jugador_con_muchos_dados, 'total_de_dados_en_juego', return_value=5)
+    mocker.patch.object(jugador_con_un_dado, 'total_de_dados_en_juego', return_value=1)
+    
+    # Los agregamos a la lista de jugadores
+    jugadores = [jugador_con_muchos_dados, jugador_con_un_dado]
+    
+    # Creamos el árbitro, y el jugador_con_un_dado tiene el ID 1
+    arbitro = ArbitroRonda(0, jugadores)
+    
+    
+    arbitro.iniciar_ronda()
+    
+    # Verificamos que el jugador actual ahora es el jugador con un dado
+    assert arbitro.jugador_actual_id == 1
