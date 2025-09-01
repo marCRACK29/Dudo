@@ -1,20 +1,28 @@
+from typing import Optional, Tuple
+Apuesta = Tuple[int, int]  # (cantidad, pinta)
+
 class ValidadorApuesta:
-    def es_apuesta_valida(self, apuesta, apuesta_anterior, total_dados):
+    def es_apuesta_valida(
+        self,
+        apuesta: Apuesta,
+        apuesta_anterior: Apuesta,
+        total_dados: int
+    ) -> tuple[bool, str]:
         if not self._es_numero_valido(apuesta):
             return False, "Número inválido"
         if not self._es_cantidad_posible(apuesta, total_dados): 
             return False, "Cantidad de dados imposible"
         if not self._es_mayor_a_la_anterior(apuesta, apuesta_anterior):
             return False, "No se esta respetando la jerarquía"
-        return True
+        return True, "OK"
     
-    def _es_numero_valido(self, apuesta) -> bool:
+    def _es_numero_valido(self, apuesta: Apuesta) -> bool:
         return 1 <= apuesta[1] <= 6
     
-    def _es_cantidad_posible(self, apuesta, total_dados) -> bool:
+    def _es_cantidad_posible(self, apuesta: Apuesta, total_dados: int) -> bool:
         return 1 <= apuesta[0] <= total_dados
     
-    def _es_mayor_a_la_anterior(self, apuesta_actual, apuesta_anterior) -> bool: 
+    def _es_mayor_a_la_anterior(self, apuesta_actual: Apuesta, apuesta_anterior: Apuesta) -> bool:
         if apuesta_actual[1] == apuesta_anterior[1]: # misma pinta 
             return apuesta_actual[0] > apuesta_anterior[0] # los números deben respetar la jerarquia
         else: #pintas distintas

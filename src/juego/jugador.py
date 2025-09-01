@@ -1,6 +1,8 @@
 from src.juego.cacho import Cacho
 from src.juego.dado import Dado
 import random
+from typing import Optional, Tuple
+Apuesta = Tuple[int, int]
 
 class Jugador:
     def __init__(self):
@@ -24,7 +26,7 @@ class Jugador:
         else:
             self.dados_calzados.append(dado_ganado)
 
-    def realizar_apuesta(self, apuesta_actual):
+    def realizar_apuesta(self, apuesta_actual: Apuesta):
         self.apuesta_actual = apuesta_actual
     
     def elegir_jugador(self, jugadores_disponibles):

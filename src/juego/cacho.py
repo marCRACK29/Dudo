@@ -20,7 +20,7 @@ class Cacho:
             return self._dados.pop()
         raise ValueError("No quedan dados. Jugador fuera.")
     
-    def gana_dado(self, dado) -> str:
+    def gana_dado(self, dado: Dado) -> str:
         if len(self._dados) >= 5:
             raise ValueError("Límite de 5 dados alcanzado. Dejar dado en depósito del jugador.")
         else:

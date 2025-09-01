@@ -14,7 +14,7 @@ def test_es_numero_valido(validador):
     valido = validador.es_apuesta_valida(apuesta_uno, apuesta_anterior,  total_dados=10)
     invalido = validador.es_apuesta_valida(apuesta_dos, apuesta_anterior, total_dados=10)
 
-    assert valido == True
+    assert valido == (True, "OK")
     assert invalido == (False, 'Número inválido')
 
 def test_cantidad_imposible(validador):
@@ -36,7 +36,7 @@ def test_apuesta_respetando_jerarquia_pinta(validador):
     valido = validador.es_apuesta_valida(apuesta_uno, apuesta_dos, total_dados=10)
     
     assert invalido == (False, 'No se esta respetando la jerarquía')
-    assert valido == True
+    assert valido == (True, "OK")
     
 def test_apuesta_respetando_jerarquia_numero(validador):
     apuesta_uno = (3, 3) # tres trenes
@@ -47,7 +47,7 @@ def test_apuesta_respetando_jerarquia_numero(validador):
     valido = validador.es_apuesta_valida(apuesta_uno, apuesta_dos, total_dados=10)
     
     assert invalido == (False, 'No se esta respetando la jerarquía')
-    assert valido == True
+    assert valido == (True,  "OK")
 
 def test_cambiar_a_ases():
     pass

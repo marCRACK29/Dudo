@@ -17,7 +17,7 @@ from src.juego.validador_apuesta import ValidadorApuesta
 def test_rotacion_jugadores_horaria(inicial,cantidad, esperado):
     jugadores = [Jugador() for i in range(cantidad)]
     arbitro = ArbitroRonda(inicial, jugadores=jugadores)
-    arbitro.siguiente_jugador()
+    arbitro._siguiente_jugador()
     assert arbitro.jugador_actual_id == esperado
 
 @pytest.mark.parametrize(
@@ -33,7 +33,7 @@ def test_rotacion_jugadores_horaria(inicial,cantidad, esperado):
 def test_rotacion_jugadores_antihoraria(inicial, cantidad, esperado):
     jugadores = [Jugador() for i in range(cantidad)]
     arbitro = ArbitroRonda(inicial, jugadores, Rotacion.ANTIHORARIO)
-    arbitro.siguiente_jugador()
+    arbitro._siguiente_jugador()
     assert arbitro.jugador_actual_id == esperado
 
 @pytest.mark.parametrize(
