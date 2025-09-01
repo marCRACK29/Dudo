@@ -9,10 +9,14 @@ class GestorPartida:
     def generar_arbitro(self, rotacion: Rotacion):
         self.arbitro = ArbitroRonda(self.primer_jugador, self.jugadores, rotacion=rotacion)
 
+    def _eliminar_jugadores_sin_dados(self):
+        self.jugadores = [j for j in self.jugadores if j.total_de_dados_en_juego() > 0]
+
     def jugar_ronda(self, proveedor_desiciones: "Clase desicion"):
         while True:
             decision, apuesta = proveedor_desiciones.decidir()
             self.arbitro.procesar_jugada(decision, apuesta)
+            self._eliminar_jugadores_sin_dados()
             if apuesta is None:
                 break
 
