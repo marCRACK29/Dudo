@@ -107,16 +107,13 @@ def test_jugar_ronda(monkeypatch, manos, llamadas_esperadas, resultado):
     for j, mano in zip(partida.jugadores, manos):
         _set_mano(j, mano)
 
-    # 5) Construir proveedores: todos comparten la MISMA cola secuencial
+    # 5) Se genera un proveedor de desiciones a modo de mock. En un entorno real va seria con input directo del usuario
     proveedor = ProveedorScripted(llamadas_esperadas)
 
-    # 6) Snapshot de dados antes
-    antes = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
-
-    # 7) Ejecutar la ronda
+    # 6) Ejecutar la ronda
     partida.jugar_ronda(proveedor)
 
-    # 8) Snapshot de dados después y detectar quién empieza la próxima ronda
+    # 7) Snapshot de dados después y detectar quién empieza la próxima ronda
     despues = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
 
 
