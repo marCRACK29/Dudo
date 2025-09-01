@@ -258,3 +258,32 @@ def test_setear_jugador_prox_ronda():
     arbitro._setear_inicio_ronda(jugador_objetivo)
 
     assert arbitro.jugador_actual_id == 2
+
+@pytest.mark.parametrize(
+    "cantidad_dados, es_jugador_con_un_dado_esperado",
+    [
+        # Escenario 1: El jugador tiene un solo dado
+        (1, True),
+        # Escenario 2: El jugador tiene más de un dado
+        (3, False)
+    ]
+)
+def test_arbitro_verifica_si_jugador_tiene_un_dado(
+    cantidad_dados, es_jugador_con_un_dado_esperado, mocker
+):
+    # Creamos un árbitro con un jugador de prueba
+    jugador_de_prueba = Jugador()
+    arbitro = ArbitroRonda(0, [jugador_de_prueba])
+    
+    # Mockeamos el método total_de_dados_en_juego para controlar el resultado
+    mocker.patch.object(
+        jugador_de_prueba, 
+        'total_de_dados_en_juego', 
+        return_value=cantidad_dados
+    )
+    
+    # Llamamos al nuevo método que vamos a crear
+    resultado = arbitro.es_jugador_con_un_dado()
+    
+    # Verificamos que el resultado es el que esperamos
+    assert resultado == es_jugador_con_un_dado_esperado
