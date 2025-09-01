@@ -55,38 +55,45 @@ class ArbitroRonda:
         jugador_anterior = self.jugadores[(self.jugador_actual_id - self.rotacion.value) % len(self.jugadores)]
 
         if opcion_juego == OpcionesJuego.APUESTO:
-            es_valido, msg = validador_apuesta.es_apuesta_valida(
-                apuesta_actual,
-                self.apuesta_anterior,
-                total_dados_en_juego
-            )
-            if not es_valido:
-                return
-            self.apuesta_anterior = apuesta_actual
-            self._siguiente_jugador()
+            self._validar_resolver_apuesta(apuesta_actual, total_dados_en_juego, validador_apuesta)
 
         elif opcion_juego == OpcionesJuego.DUDO:
-            cantidad_real = self.definir_ganador(self.apuesta_anterior)
-            dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
-
-            if dudo_fue_correcto:
-                jugador_anterior.perder_dado()
-                self._setear_inicio_ronda(jugador_anterior)
-            else:
-                jugador_actual.perder_dado()
-                self._setear_inicio_ronda(jugador_actual)
+            self._resolver_dudo(jugador_actual, jugador_anterior)
 
         elif opcion_juego == OpcionesJuego.CALZO:
-            cantidad_real = self.definir_ganador(self.apuesta_anterior)
-            calzo_fue_correcto = cantidad_real == self.apuesta_anterior[0]
-
-            if calzo_fue_correcto:
-                jugador_actual.ganar_dado()
-                self._setear_inicio_ronda(jugador_actual)
-            else:
-                jugador_actual.perder_dado()
-                self._setear_inicio_ronda(jugador_actual)
+            self._resolver_calzo(jugador_actual)
 
     def es_jugador_con_un_dado(self):
         jugador_actual = self.jugadores[self.jugador_actual_id]
         return jugador_actual.total_de_dados_en_juego() == 1
+
+    def _resolver_calzo(self, jugador_actual):
+        cantidad_real = self.definir_ganador(self.apuesta_anterior)
+        calzo_fue_correcto = cantidad_real == self.apuesta_anterior[0]
+        if calzo_fue_correcto:
+            jugador_actual.ganar_dado()
+            self._setear_inicio_ronda(jugador_actual)
+        else:
+            jugador_actual.perder_dado()
+            self._setear_inicio_ronda(jugador_actual)
+
+    def _resolver_dudo(self, jugador_actual, jugador_anterior):
+        cantidad_real = self.definir_ganador(self.apuesta_anterior)
+        dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
+        if dudo_fue_correcto:
+            jugador_anterior.perder_dado()
+            self._setear_inicio_ronda(jugador_anterior)
+        else:
+            jugador_actual.perder_dado()
+            self._setear_inicio_ronda(jugador_actual)
+
+
+    def _validar_resolver_apuesta(self, apuesta_actual, total_dados_en_juego, validador_apuesta):
+        es_valido, msg = validador_apuesta.es_apuesta_valida(
+            apuesta_actual,
+            self.apuesta_anterior,
+            total_dados_en_juego
+        )
+        if es_valido:
+            self.apuesta_anterior = apuesta_actual
+            self._siguiente_jugador()
