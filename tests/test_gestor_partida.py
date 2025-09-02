@@ -133,3 +133,57 @@ def test_eliminar_jugador_sin_dados():
     # Debe haber solo 2 jugadores ahora
     assert len(partida.jugadores) == 2
     assert jugador_a_eliminar not in partida.jugadores
+
+
+
+class ArbitroDummy:
+    """Stub: ignora las jugadas."""
+    def procesar_jugada(self, decision, apuesta):
+        pass
+@pytest.mark.parametrize(
+    "cantidad_jugadores, jugadores_sin_dados, decision_final, esperado",
+    [
+        # Si al terminar la ronda queda 1 jugador, True (partida ganada)
+        (2, [0], OpcionesJuego.DUDO, True),
+        (3, [1, 2], OpcionesJuego.CALZO, True),
+
+        # Si quedan >1 jugadores al terminar la ronda, False (partida no terminada)
+        (3, [1], OpcionesJuego.DUDO, False),
+        (6, [5], OpcionesJuego.CALZO, False),
+
+        # Caso extremo: quedan 1 vs muchos eliminados -> True
+        (6, [0,1,2,3,4], OpcionesJuego.DUDO, True),
+    ],
+    ids=[
+        "2jug-1eliminado-termina",
+        "3jug-2eliminados-termina",
+        "3jug-1eliminado-no_termina",
+        "6jug-1eliminado-no_termina",
+        "6jug-5eliminados-termina"
+    ]
+)
+def test_jugar_ronda_devuelve_true_si_partida_termina(cantidad_jugadores, jugadores_sin_dados, decision_final, esperado, monkeypatch):
+    # Arrange
+    partida = GestorPartida(cantidad_jugadores)
+
+    # Stub del árbitro para aislar la prueba
+    partida.arbitro = ArbitroDummy()
+
+    # Forzamos jugadores eliminados (sin dados)
+    for j_id in jugadores_sin_dados:
+        j = partida.jugadores[j_id]
+        for _ in range(5):
+            j.perder_dado()
+    partida._eliminar_jugadores_sin_dados()
+
+    # Proveedor que hace una jugada cualquiera y luego cierra la ronda con DUDO/CALZO
+    proveedor = ProveedorScripted([
+        (OpcionesJuego.APUESTO, (2, 5)),
+        (decision_final, None),
+    ])
+
+    # Act
+    resultado = partida.jugar_ronda(proveedor)
+
+    # Assert
+    assert resultado == esperado

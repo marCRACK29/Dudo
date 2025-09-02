@@ -12,13 +12,15 @@ class GestorPartida:
     def _eliminar_jugadores_sin_dados(self):
         self.jugadores = [j for j in self.jugadores if j.total_de_dados_en_juego() > 0]
 
-    def jugar_ronda(self, proveedor_desiciones):
+    def jugar_ronda(self, proveedor_desiciones) -> bool:
         while True:
+
             decision, apuesta = proveedor_desiciones.decidir()
             self.arbitro.procesar_jugada(decision, apuesta)
             self._eliminar_jugadores_sin_dados()
             if decision in (OpcionesJuego.DUDO, OpcionesJuego.CALZO):
                 break
+        return len(self.jugadores) == 1
 
     def _elegir_primer_jugador(self, cantidad_jugadores: int):
         dados_empate = list(range(0, cantidad_jugadores))
