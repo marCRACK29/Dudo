@@ -329,3 +329,38 @@ def test_arbitro_asigna_primer_turno_a_jugador_con_un_dado(mocker):
     
     # Verificamos que el jugador actual ahora es el jugador con un dado
     assert arbitro.jugador_actual_id == 1
+
+@pytest.mark.parametrize(
+    "dados_jugador_especial, ya_tuvo_ronda_especial, turno_esperado",
+    [
+        # Escenario 1: Jugador con un dado, no ha tenido ronda especial.
+        # El árbitro le da el turno a él (ID 1).
+        (1, False, 1),
+        
+        # Escenario 2: Jugador con un dado, YA TUVO ronda especial.
+        # El árbitro NO le da el turno, y se queda en el jugador inicial (ID 0).
+        (1, True, 0),
+    ]
+)
+def test_jugador_con_un_dado_obtiene_turno_especial_solo_una_vez(
+    dados_jugador_especial, ya_tuvo_ronda_especial, turno_esperado, mocker
+):
+    # Jugador 1: El jugador que puede tener el turno especial
+    jugador_1 = Jugador()
+    mocker.patch.object(jugador_1, 'total_de_dados_en_juego', return_value=dados_jugador_especial)
+    
+    # Jugador 2: Un jugador normal
+    jugador_2 = Jugador()
+    mocker.patch.object(jugador_2, 'total_de_dados_en_juego', return_value=5)
+    
+    jugadores = [jugador_2, jugador_1]
+    arbitro = ArbitroRonda(0, jugadores)
+    
+    # Mockeamos el nuevo atributo 'ya_tuvo_ronda_especial'
+    mocker.patch.object(jugador_1, 'ya_tuvo_ronda_especial', ya_tuvo_ronda_especial)
+    
+    # Llamamos al método iniciar_ronda
+    arbitro.iniciar_ronda()
+    
+    # Verificamos que el turno se asigna correctamente
+    assert arbitro.jugador_actual_id == turno_esperado
