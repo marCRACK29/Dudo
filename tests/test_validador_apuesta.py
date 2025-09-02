@@ -61,14 +61,14 @@ def test_cambiar_a_ases(validador):
     assert invalido == False
     assert valido == True
 
-def test_cambiar_de_ases():
+def test_cambiar_de_ases(validador):
     apuesta_normal = (7, 3) # 7 trenes
     apuesta_ases_uno = (4, 1) # 4 ases
     apuesta_ases_dos = (3, 1) # 3 ases
 
 
-    valido = validador.cambiar_de_ases(apuesta_actual=apuesta_normal, apuesta_anterior=apuesta_ases_uno)
-    invalido = validador.cambiar_de_ases(apuesta_actual=apuesta_normal, apuesta_anterior=apuesta_ases_dos)
+    valido = validador.cambiar_de_ases(apuesta_actual=apuesta_normal, apuesta_anterior=apuesta_ases_dos)
+    invalido = validador.cambiar_de_ases(apuesta_actual=apuesta_normal, apuesta_anterior=apuesta_ases_uno)
 
     assert invalido == False
     assert valido == True

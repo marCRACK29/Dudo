@@ -34,3 +34,17 @@ class ValidadorApuesta:
         #pintas distintas, pero no respeta la jerarquia de números
         #ej: (cuatro quintas) y luego (dos sextas) -> respeta pintas, pero no numeros
         return False
+    
+    def cambiar_a_ases(self, apuesta_actual, apuesta_anterior) -> bool:
+        res = apuesta_anterior[0]//2 + 1
+        if res == apuesta_actual[0]: 
+            return True
+        else: 
+            return False
+        
+    def cambiar_de_ases(self, apuesta_actual, apuesta_anterior) -> bool:
+        res = apuesta_anterior[0]*2 + 1
+        if res == apuesta_actual[0]:
+            return True
+        else: 
+            return False
