@@ -20,7 +20,7 @@ class GestorPartida:
             self._eliminar_jugadores_sin_dados()
             if decision in (OpcionesJuego.DUDO, OpcionesJuego.CALZO):
                 break
-        return False
+        return len(self.jugadores) == 1
 
     def _elegir_primer_jugador(self, cantidad_jugadores: int):
         dados_empate = list(range(0, cantidad_jugadores))
