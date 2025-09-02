@@ -441,3 +441,48 @@ def test_dudo_abierto_resuelve_correctamente(
     else:
         mock_perder.assert_called_once()
         mock_ganar.assert_not_called()
+
+@pytest.mark.parametrize(
+    "dados_reales, apuesta_anterior, metodo_esperado",
+    [
+        # El dudo cerrado es correcto (hay 3 dados, se apostó 4)
+        # El jugador que dudó gana un dado.
+        (3, (4, 5), 'ganar_dado'),
+        
+        # El dudo cerrado es incorrecto (hay 5 dados, se apostó 4)
+        # El jugador que dudó pierde un dado.
+        (5, (4, 5), 'perder_dado')
+    ]
+)
+def test_dudo_cerrado_resuelve_correctamente(
+    dados_reales, apuesta_anterior, metodo_esperado, mocker
+):
+    jugador_de_prueba = Jugador()
+    
+    # Creamos el árbitro
+    arbitro = ArbitroRonda(0, [jugador_de_prueba])
+    
+    # Establecemos el estado de la ronda
+    arbitro.apuesta_anterior = apuesta_anterior    
+
+    # Mockeamos el resultado real de los dados para que sea predecible
+    mocker.patch.object(arbitro, 'definir_ganador', return_value=dados_reales)
+
+    jugador_dudador = arbitro.jugadores[arbitro.jugador_actual_id]
+    
+    # Mockeamos los métodos de ganar/perder para espiarlos
+    mock_ganar = mocker.patch.object(jugador_dudador, 'ganar_dado')
+    mock_perder = mocker.patch.object(jugador_dudador, 'perder_dado')
+    
+    # Ejecutamos el método a probar
+    arbitro.dudo_cerrado_resuelve()
+    
+    # Verificamos que el método esperado fue llamado
+    if metodo_esperado == 'ganar_dado':
+        mock_ganar.assert_called_once()
+        mock_perder.assert_not_called()
+    else:
+        mock_perder.assert_called_once()
+        mock_ganar.assert_not_called()
+
+        
