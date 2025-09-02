@@ -8,6 +8,10 @@ class OpcionesJuego(Enum):
     CALZO = 2
     APUESTO = 3
 
+class OpcionesDudoEspecial(Enum):
+    ABIERTO = 1
+    CERRADO = 2
+
 class Rotacion(Enum):
     HORARIO = 1
     ANTIHORARIO = -1
@@ -50,7 +54,7 @@ class ArbitroRonda:
             raise ValueError("El jugador no pertenece a esta ronda")
         self.jugador_actual_id = self.jugadores.index(jugador)
 
-    def procesar_jugada(self, opcion_juego: OpcionesJuego, apuesta_actual: Tuple[int, int]):
+    def procesar_jugada(self, opcion_juego: OpcionesJuego, apuesta_actual: Tuple[int, int], opcion_dudo_especial: Optional[OpcionesDudoEspecial] = None):
         validador_apuesta = ValidadorApuesta()
         total_dados_en_juego = sum(jugador.total_de_dados_en_juego() for jugador in self.jugadores)
         jugador_actual = self.jugadores[self.jugador_actual_id]
@@ -60,7 +64,7 @@ class ArbitroRonda:
             self._validar_resolver_apuesta(apuesta_actual, total_dados_en_juego, validador_apuesta)
 
         elif opcion_juego == OpcionesJuego.DUDO:
-            self._resolver_dudo(jugador_actual, jugador_anterior)
+            self._resolver_dudo(jugador_actual, jugador_anterior, opcion_dudo_especial)
 
         elif opcion_juego == OpcionesJuego.CALZO:
             self._resolver_calzo(jugador_actual)
@@ -79,15 +83,22 @@ class ArbitroRonda:
             jugador_actual.perder_dado()
             self._setear_inicio_ronda(jugador_actual)
 
-    def _resolver_dudo(self, jugador_actual: Jugador, jugador_anterior: Jugador):
-        cantidad_real = self.definir_ganador(self.apuesta_anterior)
-        dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
-        if dudo_fue_correcto:
-            jugador_anterior.perder_dado()
-            self._setear_inicio_ronda(jugador_anterior)
-        else:
-            jugador_actual.perder_dado()
-            self._setear_inicio_ronda(jugador_actual)
+    def _resolver_dudo(self, jugador_actual: Jugador, jugador_anterior: Jugador, opcion_dudo_especial: Optional[OpcionesDudoEspecial] = None):
+        
+        if self.es_jugador_con_un_dado() and opcion_dudo_especial:
+            if opcion_dudo_especial == OpcionesDudoEspecial.ABIERTO:
+                self.dudo_abierto_resuelve()
+            elif opcion_dudo_especial == OpcionesDudoEspecial.CERRADO:
+                self.dudo_cerrado_resuelve()
+        else:          
+            cantidad_real = self.definir_ganador(self.apuesta_anterior)
+            dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
+            if dudo_fue_correcto:
+                jugador_anterior.perder_dado()
+                self._setear_inicio_ronda(jugador_anterior)
+            else:
+                jugador_actual.perder_dado()
+                self._setear_inicio_ronda(jugador_actual)
 
     def _validar_resolver_apuesta(self, apuesta_actual: Tuple[int, int], total_dados_en_juego: int,
                                   validador_apuesta: ValidadorApuesta):
@@ -99,9 +110,15 @@ class ArbitroRonda:
         if es_valido:
             self.apuesta_anterior = apuesta_actual
             self._siguiente_jugador()
+            
     def iniciar_ronda(self):
         for jugador_id, jugador in enumerate(self.jugadores):
             if jugador.total_de_dados_en_juego() == 1 and not jugador.ya_tuvo_ronda_especial: 
                 self.jugador_actual_id = jugador_id
                 jugador.ya_tuvo_ronda_especial = True # aqui sabemos que tuvo su ronda especial
                 return
+            
+    def dudo_abierto_resuelve():
+        pass
+    def dudo_cerrado_resuelve():
+        pass
