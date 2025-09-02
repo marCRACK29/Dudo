@@ -49,8 +49,26 @@ def test_apuesta_respetando_jerarquia_numero(validador):
     assert invalido == (False, 'No se esta respetando la jerarquía')
     assert valido == (True,  "OK")
 
-def test_cambiar_a_ases():
-    pass
+def test_cambiar_a_ases(validador):
+    apuesta_normal = (8, 3) # 8 trenes
+    apuesta_ases_uno = (5, 1) # 5 ases
+    apuesta_ases_dos = (4, 1) # 4 ases
+
+
+    valido = validador.cambiar_a_ases(apuesta_actual=apuesta_ases_uno, apuesta_anterior=apuesta_normal)
+    invalido = validador.cambiar_a_ases(apuesta_actual=apuesta_ases_dos, apuesta_anterior=apuesta_normal)
+
+    assert invalido == False
+    assert valido == True
 
 def test_cambiar_de_ases():
-    pass
+    apuesta_normal = (7, 3) # 7 trenes
+    apuesta_ases_uno = (4, 1) # 4 ases
+    apuesta_ases_dos = (3, 1) # 3 ases
+
+
+    valido = validador.cambiar_de_ases(apuesta_actual=apuesta_normal, apuesta_anterior=apuesta_ases_uno)
+    invalido = validador.cambiar_de_ases(apuesta_actual=apuesta_normal, apuesta_anterior=apuesta_ases_dos)
+
+    assert invalido == False
+    assert valido == True
