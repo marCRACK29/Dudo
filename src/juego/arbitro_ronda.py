@@ -110,7 +110,7 @@ class ArbitroRonda:
         if es_valido:
             self.apuesta_anterior = apuesta_actual
             self._siguiente_jugador()
-            
+
     def iniciar_ronda(self):
         for jugador_id, jugador in enumerate(self.jugadores):
             if jugador.total_de_dados_en_juego() == 1 and not jugador.ya_tuvo_ronda_especial: 
@@ -118,7 +118,28 @@ class ArbitroRonda:
                 jugador.ya_tuvo_ronda_especial = True # aqui sabemos que tuvo su ronda especial
                 return
             
-    def dudo_abierto_resuelve():
-        pass
-    def dudo_cerrado_resuelve():
-        pass
+    def dudo_abierto_resuelve(self):
+        jugador_actual = self.jugadores[self.jugador_actual_id]
+
+        #asumimos que el jugador tiene un solo dado y accedemos a esa posicion
+        resultado_dado = jugador_actual.cacho.resultados_numericos[0]
+
+        valor_apuesta = self.apuesta_anterior[1]
+
+        if resultado_dado ==valor_apuesta:
+            jugador_actual.ganar_dado()
+        else:
+            jugador_actual.perder_dado()
+
+    def dudo_cerrado_resuelve(self):
+        jugador_actual = self.jugadores[self.jugador_actual_id]
+
+        # Obtenemos la cantidad real de dados usando el método ya probado
+        cantidad_real = self.definir_ganador(self.apuesta_anterior)
+
+        cantidad_apuesta = self.apuesta_anterior[0]
+
+        if cantidad_real < cantidad_apuesta:
+            jugador_actual.ganar_dado()
+        else:
+            jugador_actual.perder_dado()
