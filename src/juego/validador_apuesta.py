@@ -6,21 +6,26 @@ class ValidadorApuesta:
         self,
         apuesta: Apuesta,
         apuesta_anterior: Apuesta | None,
-        total_dados: int
+        total_dados: int, 
+        jugador_con_un_dado: bool = False
     ) -> tuple[bool, str]:
+        if apuesta_anterior is None and apuesta[1] == 1:
+            if not jugador_con_un_dado:
+                return False, "No puedes comenzar apostando con as si tienes más de un dado"
         if not self._es_numero_valido(apuesta):
             return False, "Número inválido"
         if not self._es_cantidad_posible(apuesta, total_dados): 
             return False, "Cantidad de dados imposible"
-        if apuesta[1] == 1 and apuesta_anterior[1] != 1: # si se cambia de "pintas normales" a ases
-            if not self._cambiar_a_ases(apuesta, apuesta_anterior):
-                return False, "No se respeta el cambio a ases"
-        elif apuesta[1] != 1 and apuesta_anterior[1] == 1: # si se cambia de ases a "pintas normales"
-            if not self._cambiar_de_ases(apuesta, apuesta_anterior):
-                return False, "No se respeta el cambio desde ases"
-        else: 
-            if not self._es_mayor_a_la_anterior(apuesta, apuesta_anterior):
-                return False, "No se esta respetando la jerarquía"
+        if apuesta_anterior is not None:
+            if apuesta[1] == 1 and apuesta_anterior[1] != 1: # si se cambia de "pintas normales" a ases
+                if not self._cambiar_a_ases(apuesta, apuesta_anterior):
+                    return False, "No se respeta el cambio a ases"
+            elif apuesta[1] != 1 and apuesta_anterior[1] == 1: # si se cambia de ases a "pintas normales"
+                if not self._cambiar_de_ases(apuesta, apuesta_anterior):
+                    return False, "No se respeta el cambio desde ases"
+            else: 
+                if not self._es_mayor_a_la_anterior(apuesta, apuesta_anterior):
+                    return False, "No se esta respetando la jerarquía"
         return True, "OK"
     
     def _es_numero_valido(self, apuesta: Apuesta) -> bool:
@@ -52,12 +57,6 @@ class ValidadorApuesta:
     def _cambiar_de_ases(self, apuesta_actual, apuesta_anterior) -> bool:
         res = apuesta_anterior[0]*2 + 1
         if res == apuesta_actual[0]:
-            return True
-        else: 
-            return False
-    
-    def primero_ases(self, apuesta, apuesta_anterior=None, jugador_con_un_dado=False):
-        if apuesta[1] == 1 and apuesta_anterior == None and jugador_con_un_dado == True: 
             return True
         else: 
             return False

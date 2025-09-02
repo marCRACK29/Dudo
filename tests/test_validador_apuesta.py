@@ -75,11 +75,11 @@ def test_cambiar_de_ases(validador):
 
 def test_primera_apuesta_con_as(validador):
     apuesta = (3,1)
-    valido = validador.primero_ases(apuesta, apuesta_anterior=None, jugador_con_un_dado=True)
-    invalido = validador.primero_ases(apuesta, apuesta_anterior=(3, 2), jugador_con_un_dado=False)
+    valido = validador.es_apuesta_valida(apuesta, apuesta_anterior=None, total_dados=10,jugador_con_un_dado=True)
+    invalido = validador.es_apuesta_valida(apuesta, apuesta_anterior=None, total_dados=10,jugador_con_un_dado=False)
 
-    assert valido == True
-    assert invalido == False
+    assert valido == (True, "OK")
+    assert invalido == (False, "No puedes comenzar apostando con as si tienes más de un dado")
 
 
 
