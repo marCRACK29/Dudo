@@ -119,8 +119,9 @@ class ArbitroRonda:
                 return
             
     def dudo_abierto_resuelve(self):
-        jugador_actual =self.jugadores[self.jugador_actual_id]
+        jugador_actual = self.jugadores[self.jugador_actual_id]
 
+        #asumimos que el jugador tiene un solo dado y accedemos a esa posicion
         resultado_dado = jugador_actual.cacho.resultados_numericos[0]
 
         valor_apuesta = self.apuesta_anterior[1]
@@ -130,5 +131,15 @@ class ArbitroRonda:
         else:
             jugador_actual.perder_dado()
 
-    def dudo_cerrado_resuelve():
-        pass
+    def dudo_cerrado_resuelve(self):
+        jugador_actual = self.jugadores[self.jugador_actual_id]
+
+        # Obtenemos la cantidad real de dados usando el método ya probado
+        cantidad_real = self.definir_ganador(self.apuesta_anterior)
+
+        cantidad_apuesta = self.apuesta_anterior[0]
+
+        if cantidad_real < cantidad_apuesta:
+            jugador_actual.ganar_dado()
+        else:
+            jugador_actual.perder_dado()
