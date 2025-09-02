@@ -73,6 +73,9 @@ class ArbitroRonda:
         jugador_actual = self.jugadores[self.jugador_actual_id]
         return jugador_actual.total_de_dados_en_juego() == 1
 
+    def reiniciar_ronda(self):
+        self.apuesta_anterior = None
+
     def _resolver_calzo(self, jugador_actual: Jugador):
         cantidad_real = self.definir_ganador(self.apuesta_anterior)
         calzo_fue_correcto = cantidad_real == self.apuesta_anterior[0]

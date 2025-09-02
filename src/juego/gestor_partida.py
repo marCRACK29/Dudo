@@ -20,6 +20,7 @@ class GestorPartida:
             self._eliminar_jugadores_sin_dados()
             if decision in (OpcionesJuego.DUDO, OpcionesJuego.CALZO):
                 break
+        self.arbitro.reiniciar_ronda()
         return len(self.jugadores) == 1
 
     def _elegir_primer_jugador(self, cantidad_jugadores: int):

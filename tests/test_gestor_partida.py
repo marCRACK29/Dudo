@@ -260,9 +260,24 @@ def test_eliminar_jugador_sin_dados():
 
 
 class ArbitroDummy:
-    """Stub: ignora las jugadas."""
+    """Stub de árbitro para tests de GestorPartida."""
+    def __init__(self):
+        self.jugador_actual_id = 0
+        self.apuesta_anterior = None  # mismo atributo que usa el real
+
     def procesar_jugada(self, decision, apuesta):
+        # Mantén el contrato básico: si hay apuesta, recuerda la última.
+        if decision == OpcionesJuego.APUESTO:
+            self.apuesta_anterior = apuesta
+        # No valida, no cuenta dados, no determina ganador: es un stub.
+
+    def siguiente_jugador(self):
+        # No-op (si tu GestorPartida lo llama entre jugadas)
         pass
+
+    def reiniciar_ronda(self):
+        # Idéntico al real: limpia el estado de la ronda
+        self.apuesta_anterior = None
 @pytest.mark.parametrize(
     "cantidad_jugadores, jugadores_sin_dados, decision_final, esperado",
     [
