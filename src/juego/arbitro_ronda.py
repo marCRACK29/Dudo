@@ -101,6 +101,7 @@ class ArbitroRonda:
             self._siguiente_jugador()
     def iniciar_ronda(self):
         for jugador_id, jugador in enumerate(self.jugadores):
-            if jugador.total_de_dados_en_juego() == 1:
+            if jugador.total_de_dados_en_juego() == 1 and not jugador.ya_tuvo_ronda_especial: 
                 self.jugador_actual_id = jugador_id
+                jugador.ya_tuvo_ronda_especial = True # aqui sabemos que tuvo su ronda especial
                 return

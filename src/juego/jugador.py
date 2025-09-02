@@ -9,6 +9,7 @@ class Jugador:
         self.cacho = Cacho()
         self.dados_calzados = []
         self.apuesta_actual = None
+        self.ya_tuvo_ronda_especial = False
 
     def total_de_dados_en_juego(self):
         return len(self.cacho.dados_actuales)
