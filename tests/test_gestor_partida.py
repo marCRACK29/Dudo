@@ -1,37 +1,26 @@
 import pytest
+import src.juego.arbitro_ronda as modulo_arbitro
+
 from src.juego.gestor_partida import GestorPartida
 from src.juego.arbitro_ronda import OpcionesJuego, Rotacion
 from src.juego.jugador import Jugador
-import src.juego.arbitro_ronda as modulo_arbitro
 from src.servicios.desiciones_simuladas import ProveedorScripted
 
+class ArbitroDummy:
+    """Stub de árbitro para tests de GestorPartida."""
+    def __init__(self):
+        self.jugador_actual_id = 0
+        self.apuesta_anterior = None  # mismo atributo que usa el real
 
-@pytest.mark.parametrize("cantidad_jugadores",
-    [2, 5, 6, 8]
-)
-def test_creacion_jugadores(cantidad_jugadores):
-    partida = GestorPartida(cantidad_jugadores)
-    jugadores = partida.jugadores
-    assert len(jugadores) == cantidad_jugadores
-    for jugador in jugadores:
-        assert isinstance(jugador, Jugador)
+    def procesar_jugada(self, decision, apuesta):
+        if decision == OpcionesJuego.APUESTO:
+            self.apuesta_anterior = apuesta
 
-@pytest.mark.parametrize("datos_lanzamientos, resultado",
-    [
-        ([1, 2, 3, 4, 5, 6], 5),
-        ([1, 2, 3, 4, 6, 6, 6, 1], 4),
-        ([6, 6, 6, 6, 6, 6, 1, 1, 6, 1, 6, 1, 3, 5], 4)
-    ]
-)
-def test_seis_jugadores_lanzan_controlado(mocker, datos_lanzamientos, resultado):
-    # Parchea Dado EN EL MÓDULO donde se usa (jugador.py)
-    MockDado = mocker.patch('src.juego.gestor_partida.Jugador')
-    # Cada llamada a .tirar() devolverá, en orden: 1,2,3,4,5,6
-    MockDado.return_value.lanzar_un_dado.side_effect = datos_lanzamientos
+    def siguiente_jugador(self):
+        pass
 
-    partida = GestorPartida(6)
-
-    assert partida.primer_jugador == resultado
+    def reiniciar_ronda(self):
+        self.apuesta_anterior = None
 
 def _set_mano(jugador, mano):
     """Fija una mano determinista en el cacho del jugador."""
@@ -46,6 +35,37 @@ def _set_mano(jugador, mano):
     # Sustituimos los dados internos del cacho
     jugador.cacho._dados = [_FakeDado(v) for v in mano]
 
+def _set_mano_respetando_cantidad(jugador: Jugador, valores):
+    """Solo usa tantos valores como dados tenga el jugador actualmente."""
+    k = len(jugador.cacho._dados)
+    _set_mano(jugador, valores[:k])
+
+@pytest.mark.parametrize("cantidad_jugadores",
+    [2, 5, 6, 8]
+)
+def test_creacion_jugadores(cantidad_jugadores):
+    """ Test para verificar la cantidad de jugadores creados"""
+    partida = GestorPartida(cantidad_jugadores)
+    jugadores = partida.jugadores
+    assert len(jugadores) == cantidad_jugadores
+    for jugador in jugadores:
+        assert isinstance(jugador, Jugador)
+
+@pytest.mark.parametrize("datos_lanzamientos, resultado",
+    [
+        ([1, 2, 3, 4, 5, 6], 5),
+        ([1, 2, 3, 4, 6, 6, 6, 1], 4),
+        ([6, 6, 6, 6, 6, 6, 1, 1, 6, 1, 6, 1, 3, 5], 4)
+    ], ids = ["Gana_sin_empate_5", "Gana_un_empate_4", "Gana_dos_empate_4"]
+)
+def test_seis_jugadores_lanzan_controlado(mocker, datos_lanzamientos, resultado):
+    """Test para simular el primer jugador que juega con lanzamientos de dados deterministas"""
+    MockDado = mocker.patch('src.juego.gestor_partida.Jugador')
+    MockDado.return_value.lanzar_un_dado.side_effect = datos_lanzamientos
+
+    partida = GestorPartida(6)
+
+    assert partida.primer_jugador == resultado
 
 @pytest.mark.parametrize(
     "manos, llamadas_esperadas, resultado",
@@ -71,7 +91,7 @@ def _set_mano(jugador, mano):
             [[1, 1, 2, 3, 4],  # J0
              [1, 2, 3, 4, 5]], # J1
             [
-                (OpcionesJuego.APUESTO, (1, 1)),
+                (OpcionesJuego.APUESTO, (1, 2)),
                 (OpcionesJuego.CALZO, None),
             ],
             # Contar 1s exactos = 3; calzo con apuesta=1 es INCORRECTO, J1 pierde un dado
@@ -84,58 +104,43 @@ def _set_mano(jugador, mano):
     ]
 )
 def test_jugar_ronda(monkeypatch, manos, llamadas_esperadas, resultado):
+    """Test para simular una sola ronda y verificar la cantidad de dados con jugadas simuladas"""
     num_jugadores = len(manos)
 
-    # 1) Forzar primer jugador determinista (0) para no depender de tiradas iniciales
     monkeypatch.setattr(
         GestorPartida,
         "_elegir_primer_jugador",
         lambda self, n: setattr(self, "primer_jugador", 0),
     )
 
-    # 2) Parchear ValidadorApuesta para que siempre "valide" la apuesta sin lanzar
-    class _ValidadorFake:
-        def es_apuesta_valida(self, *args, **kwargs):
-            return (True, "ok")
-    monkeypatch.setattr(modulo_arbitro, "ValidadorApuesta", lambda: _ValidadorFake())
-
-    # 3) Crear partida y árbitro real
     partida = GestorPartida(num_jugadores)
     partida.generar_arbitro(Rotacion.HORARIO)
 
-    # 4) Fijar manos deterministas
+    # Fijar manos deterministas
     for j, mano in zip(partida.jugadores, manos):
         _set_mano(j, mano)
 
-    # 5) Se genera un proveedor de desiciones a modo de mock. En un entorno real va seria con input directo del usuario
+    # Mock de las desiciones que se toman
     proveedor = ProveedorScripted(llamadas_esperadas)
 
-    # 6) Ejecutar la ronda
     partida.jugar_ronda(proveedor)
 
-    # 7) Snapshot de dados después y detectar quién empieza la próxima ronda
+    # Snapshot de dados después y detectar quién empieza la próxima ronda
     despues = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
 
     assert despues == resultado
 
-def _set_mano_respetando_cantidad(jugador: Jugador, valores):
-    """Solo usa tantos valores como dados tenga el jugador actualmente."""
-    k = len(jugador.cacho._dados)
-    _set_mano(jugador, valores[:k])
-
 def test_jugar_dos_rondas(monkeypatch):
-    # 1) Forzar primer jugador determinista (0) una sola vez
+    """Se verifica que jugando 2 rondas la partida no tenga problemas"""
     monkeypatch.setattr(
         GestorPartida,
         "_elegir_primer_jugador",
         lambda self, n: setattr(self, "primer_jugador", 0),
     )
-
-    # 3) Crear partida y un único árbitro
     partida = GestorPartida(3)
     partida.generar_arbitro(Rotacion.ANTIHORARIO)
 
-    # ---------- RONDA 1 (igual a tu Caso A) ----------
+    # ---------- RONDA 1 ----------
     manos_r1 = [
         [3, 3, 2, 6, 1],   # J0
         [4, 1, 3, 2, 5],   # J1
@@ -160,9 +165,9 @@ def test_jugar_dos_rondas(monkeypatch):
     # Elegimos manos para que el DUDO sea CORRECTO (total efectivos de 3 < 2),
     # de modo que pierda un dado el apostador previo.
     manos_r2 = [
-        [1, 3, 4, 5, 6],   # J0: 1 as, 0 treses
-        [2, 4, 5, 6],   # J1: 0 ases, 0 treses
-        [2, 4, 6, 5, 2],      # J2: 0 ases, 0 treses (tiene 4 dados)
+        [1, 3, 4, 5, 6],
+        [2, 4, 5, 6],
+        [2, 4, 6, 5, 2],
     ]
     for j, mano in zip(partida.jugadores, manos_r2):
         _set_mano_respetando_cantidad(j, mano)
@@ -174,21 +179,16 @@ def test_jugar_dos_rondas(monkeypatch):
 
     partida.jugar_ronda(proveedor_r2)
 
-    # Con estas manos, efectivos de "3" = 1 (solo el as de J0) < 2, por tanto el DUDO es correcto
-    # => pierde un dado quien apostó 2×3 en esa ronda (el "apostador previo").
-    # Dado el orden que gestiona tu árbitro (perdedor/ganador inicia, rotación, etc.),
-    # esta combinación lleva a que termine perdiendo J2 una vez más.
     despues_r2 = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
     assert despues_r2 == [4, 4, 5]
 
 def test_tres_rondas_dos_jugadores(monkeypatch):
-    # 1) Primer jugador determinista (0)
+    """Test de 3 rondas diferentes"""
     monkeypatch.setattr(
         GestorPartida,
         "_elegir_primer_jugador",
         lambda self, n: setattr(self, "primer_jugador", 0),
     )
-
 
     partida = GestorPartida(2)
     partida.generar_arbitro(Rotacion.HORARIO)
@@ -229,8 +229,8 @@ def test_tres_rondas_dos_jugadores(monkeypatch):
     # Secuencia: APUESTO(2×2) -> DUDO, ahora hacemos el DUDO INCORRECTO (efectivos de 2 >= 2) para que
     # pierda quien dudó.
     manos_r3 = [
-        [2, 1, 4, 5, 6],  # J0: un "2" + un as (comodín) => 2 efectivos
-        [2, 3, 4],        # J1 (3 dados): un "2" => +1, total >= 2
+        [2, 1, 4, 5, 6],
+        [2, 3, 4],
     ]
     for j, mano in zip(partida.jugadores, manos_r3):
         _set_mano_respetando_cantidad(j, mano)
@@ -242,42 +242,21 @@ def test_tres_rondas_dos_jugadores(monkeypatch):
     partida.jugar_ronda(proveedor_r3)
     assert [j.total_de_dados_en_juego() for j in partida.jugadores] == [4, 3]
 
+
 def test_eliminar_jugador_sin_dados():
     partida = GestorPartida(3)
-    
+
     # Forzamos un jugador sin dados
     jugador_a_eliminar = partida.jugadores[0]
     for _ in range(5):
         jugador_a_eliminar.perder_dado()  # se queda sin dados
-    
+
     # Ejecutamos limpieza
     partida._eliminar_jugadores_sin_dados()
-    
+
     # Debe haber solo 2 jugadores ahora
     assert len(partida.jugadores) == 2
     assert jugador_a_eliminar not in partida.jugadores
-
-
-
-class ArbitroDummy:
-    """Stub de árbitro para tests de GestorPartida."""
-    def __init__(self):
-        self.jugador_actual_id = 0
-        self.apuesta_anterior = None  # mismo atributo que usa el real
-
-    def procesar_jugada(self, decision, apuesta):
-        # Mantén el contrato básico: si hay apuesta, recuerda la última.
-        if decision == OpcionesJuego.APUESTO:
-            self.apuesta_anterior = apuesta
-        # No valida, no cuenta dados, no determina ganador: es un stub.
-
-    def siguiente_jugador(self):
-        # No-op (si tu GestorPartida lo llama entre jugadas)
-        pass
-
-    def reiniciar_ronda(self):
-        # Idéntico al real: limpia el estado de la ronda
-        self.apuesta_anterior = None
 @pytest.mark.parametrize(
     "cantidad_jugadores, jugadores_sin_dados, decision_final, esperado",
     [
@@ -300,11 +279,11 @@ class ArbitroDummy:
         "6jug-5eliminados-termina"
     ]
 )
-def test_jugar_ronda_devuelve_true_si_partida_termina(cantidad_jugadores, jugadores_sin_dados, decision_final, esperado, monkeypatch):
-    # Arrange
+def test_jugar_ronda_devuelve_true_si_partida_termina(cantidad_jugadores, jugadores_sin_dados,
+                                                      decision_final, esperado, monkeypatch):
+    """Test para verificar que juego devuelva si esta finalizada la partida o no"""
     partida = GestorPartida(cantidad_jugadores)
 
-    # Stub del árbitro para aislar la prueba
     partida.arbitro = ArbitroDummy()
 
     # Forzamos jugadores eliminados (sin dados)
@@ -314,14 +293,10 @@ def test_jugar_ronda_devuelve_true_si_partida_termina(cantidad_jugadores, jugado
             j.perder_dado()
     partida._eliminar_jugadores_sin_dados()
 
-    # Proveedor que hace una jugada cualquiera y luego cierra la ronda con DUDO/CALZO
     proveedor = ProveedorScripted([
         (OpcionesJuego.APUESTO, (2, 5)),
         (decision_final, None),
     ])
-
-    # Act
     resultado = partida.jugar_ronda(proveedor)
 
-    # Assert
     assert resultado == esperado
