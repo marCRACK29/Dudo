@@ -55,3 +55,9 @@ class ValidadorApuesta:
             return True
         else: 
             return False
+    
+    def primero_ases(self, apuesta, apuesta_anterior=None, jugador_con_un_dado=False):
+        if apuesta[1] == 1 and apuesta_anterior == None and jugador_con_un_dado == True: 
+            return True
+        else: 
+            return False

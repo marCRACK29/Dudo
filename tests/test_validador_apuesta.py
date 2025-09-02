@@ -74,10 +74,9 @@ def test_cambiar_de_ases(validador):
     assert valido == (True, "OK")
 
 def test_primera_apuesta_con_as(validador):
-    validador.ronda_especial = True
     apuesta = (3,1)
     valido = validador.primero_ases(apuesta, apuesta_anterior=None, jugador_con_un_dado=True)
-    invalido = validador.primero_ases(apuesta, apuesta_anterio=(3, 2), jugador_con_un_dado=False)
+    invalido = validador.primero_ases(apuesta, apuesta_anterior=(3, 2), jugador_con_un_dado=False)
 
     assert valido == True
     assert invalido == False
