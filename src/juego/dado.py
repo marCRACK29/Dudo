@@ -18,7 +18,7 @@ class Dado:
         return self._ultimo_resultado
     
     @property
-    def get_pinta(self) -> str: 
+    def pinta(self) -> str:
         if self._ultimo_resultado is None: 
             raise ValueError("El dado aún no ha sido tirado.")
         return self._pintas[self._ultimo_resultado]

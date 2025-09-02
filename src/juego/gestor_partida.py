@@ -17,7 +17,7 @@ class GestorPartida:
             decision, apuesta = proveedor_desiciones.decidir()
             self.arbitro.procesar_jugada(decision, apuesta)
             self._eliminar_jugadores_sin_dados()
-            if apuesta is None:
+            if decision in (OpcionesJuego.DUDO, OpcionesJuego.CALZO):
                 break
 
     def _elegir_primer_jugador(self, cantidad_jugadores: int):
