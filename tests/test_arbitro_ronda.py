@@ -180,8 +180,8 @@ def test_arbitro_cuando_jugador_hace_dudo_y_se_llama_a_definir_ganador(mocker):
 @pytest.mark.parametrize(
     "dados_reales, apuesta_duda, pierde_actual",
     [
-        (3, (4, 5), False), # Dudo correcto -> pierde el anterior
-        (5, (4, 5), True) # Dudo incorrecto -> pierde el actual
+        (3, (4, 5), False), # Dudo correcto --- pierde el anterior
+        (5, (4, 5), True) # Dudo incorrecto --- pierde el actual
     ]
 )
 def test_arbitro_aplica_regla_dudo_correctamente(dados_reales, apuesta_duda, pierde_actual, mocker):
@@ -212,11 +212,11 @@ def test_arbitro_aplica_regla_dudo_correctamente(dados_reales, apuesta_duda, pie
 @pytest.mark.parametrize(
     "dados_reales, apuesta_calzo, metodo_esperado",
     [
-        # Escenario 1: Calzo correcto (hay 4 dados, se apostó 4)
+        #Calzo correcto (hay 4 dados, se apostó 4)
         # El jugador que calzó gana un dado
         (4, (4, 5), 'ganar_dado'),
         
-        # Escenario 2: Calzo incorrecto (hay 5 dados, se apostó 4)
+        #Calzo incorrecto (hay 5 dados, se apostó 4)
         # El jugador que calzó pierde un dado
         (5, (4, 5), 'perder_dado')
     ]
@@ -262,9 +262,9 @@ def test_setear_jugador_prox_ronda():
 @pytest.mark.parametrize(
     "cantidad_dados, es_jugador_con_un_dado_esperado",
     [
-        # Escenario 1: El jugador tiene un solo dado
+        #  El jugador tiene un solo dado
         (1, True),
-        # Escenario 2: El jugador tiene más de un dado
+        # El jugador tiene más de un dado
         (3, False)
     ]
 )
@@ -284,8 +284,7 @@ def test_arbitro_verifica_si_jugador_tiene_un_dado(
     
     # Llamamos al nuevo método que vamos a crear
     resultado = arbitro.es_jugador_con_un_dado()
-    
-    # Verificamos que el resultado es el que esperamos
+
     assert resultado == es_jugador_con_un_dado_esperado
 
 def test_arbitro_asigna_primer_turno_a_jugador_con_un_dado(mocker):
@@ -300,7 +299,7 @@ def test_arbitro_asigna_primer_turno_a_jugador_con_un_dado(mocker):
     # Los agregamos a la lista de jugadores
     jugadores = [jugador_con_muchos_dados, jugador_con_un_dado]
     
-    # Creamos el árbitro, y el jugador_con_un_dado tiene el ID 1
+    # Creamos el árbitro, y el jugador_con_un_dado tiene el ID 1, que es el segundo en la lista de jugadores
     arbitro = ArbitroRonda(0, jugadores)
     
     
@@ -333,11 +332,11 @@ def test_arbitro_asigna_primer_turno_a_jugador_con_un_dado(mocker):
 @pytest.mark.parametrize(
     "dados_jugador_especial, ya_tuvo_ronda_especial, turno_esperado",
     [
-        # Escenario 1: Jugador con un dado, no ha tenido ronda especial.
+        # Jugador con un dado, no ha tenido ronda especial.
         # El árbitro le da el turno a él (ID 1).
         (1, False, 1),
         
-        # Escenario 2: Jugador con un dado, YA TUVO ronda especial.
+        # Jugador con un dado, YA TUVO ronda especial.
         # El árbitro NO le da el turno, y se queda en el jugador inicial (ID 0).
         (1, True, 0),
     ]
@@ -397,3 +396,48 @@ def test_arbitro_con_un_dado_procesa_dudo_especial(
     else:
         mock_dudo_cerrado.assert_called_once()
         mock_dudo_abierto.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "resultado_dado_abierto, apuesta_calzo, metodo_esperado",
+    [
+        # El dudo abierto es un calzo (dado es 5, se apostó 5)
+        # El jugador que calzó gana un dado.
+        (5, (1, 5), 'ganar_dado'),
+        
+        # El dudo abierto no es un calzo (dado es 3, se apostó 5)
+        # El jugador que calzó pierde un dado.
+        (3, (1, 5), 'perder_dado')
+    ]
+)
+def test_dudo_abierto_resuelve_correctamente(
+    resultado_dado_abierto, apuesta_calzo, metodo_esperado, mocker
+):
+   
+    jugador_apuesta = Jugador()
+    jugador_dudador = Jugador()
+    
+    
+    arbitro = ArbitroRonda(0, [jugador_apuesta, jugador_dudador])
+    
+    # Establecemos el estado de la ronda
+    arbitro.apuesta_anterior = apuesta_calzo
+    
+    dado_mock = mocker.Mock()
+    dado_mock.ultimo_resultado = resultado_dado_abierto 
+    mocker.patch.object(jugador_apuesta.cacho, '_dados', [dado_mock])
+    
+    # Mockeamos los métodos de ganar/perder para espiarlos
+    mock_ganar = mocker.patch.object(jugador_apuesta, 'ganar_dado')
+    mock_perder = mocker.patch.object(jugador_apuesta, 'perder_dado')
+    
+    # Ejecutamos el método a probar
+    arbitro.dudo_abierto_resuelve()
+    
+    # Verificamos que el método esperado fue llamado
+    if metodo_esperado == 'ganar_dado':
+        mock_ganar.assert_called_once()
+        mock_perder.assert_not_called()
+    else:
+        mock_perder.assert_called_once()
+        mock_ganar.assert_not_called()
