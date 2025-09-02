@@ -1,6 +1,7 @@
 import pytest
 
-from src.juego.arbitro_ronda import ArbitroRonda, Rotacion, OpcionesJuego, OpcionesDudoEspecial
+from src.juego.arbitro_ronda import ArbitroRonda
+from src.juego.enums import OpcionesJuego, OpcionesDudoEspecial, Rotacion
 from src.juego.jugador import Jugador
 from src.juego.validador_apuesta import ValidadorApuesta
 

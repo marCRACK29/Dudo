@@ -1,24 +1,29 @@
-from enum import Enum
+"""
+Módulo arbitro_ronda
+--------------------
+
+Define la clase `ArbitroRonda`, responsable de administrar
+el flujo de una ronda en el juego Dudo.
+"""
+
 from typing import Optional, Tuple
+
+from src.juego.enums import OpcionesJuego, OpcionesDudoEspecial, Rotacion
 from src.juego.validador_apuesta import ValidadorApuesta
 from src.juego.jugador import Jugador
 
-class OpcionesJuego(Enum):
-    DUDO = 1
-    CALZO = 2
-    APUESTO = 3
-
-class OpcionesDudoEspecial(Enum):
-    ABIERTO = 1
-    CERRADO = 2
-
-class Rotacion(Enum):
-    HORARIO = 1
-    ANTIHORARIO = -1
-
 class ArbitroRonda:
+
+
     def __init__(self, primer_jugador_id: int, jugadores: list[Jugador],
                  rotacion: Rotacion = Rotacion.HORARIO):
+        """Inicializa la ronda con un jugador inicial y una rotación.
+
+               Args:
+                   primer_jugador_id (int): Índice del jugador que comienza.
+                   jugadores (list[Jugador]): Lista de jugadores en la ronda.
+                   rotacion (Rotacion, optional): Dirección de la rotación.
+        """
         cantidad_jugadores = len(jugadores)
         if primer_jugador_id < 0:
             raise ValueError("Jugador inicial negativo")
@@ -33,10 +38,15 @@ class ArbitroRonda:
         self.jugadores = jugadores
         self.apuesta_anterior = None
 
-    def _siguiente_jugador(self):
-        self.jugador_actual_id = (self.jugador_actual_id + self.rotacion.value) % self.cantidad_jugadores
-
     def definir_ganador(self, adivinanza: Tuple[int, int]) -> int:
+        """Cuenta la cantidad real de dados que coinciden con una adivinanza.
+
+        Args:
+            adivinanza (tuple[int, int]): Cantidad y valor de la apuesta.
+
+        Returns:
+            int: Cantidad total encontrada en todos los jugadores.
+        """
         cantidad_adivinada = 0
         cantidad_ases = 0
         for jugador in self.jugadores:
@@ -49,12 +59,16 @@ class ArbitroRonda:
 
         return cantidad_adivinada
 
-    def _setear_inicio_ronda(self, jugador: Jugador):
-        if jugador not in self.jugadores:
-            raise ValueError("El jugador no pertenece a esta ronda")
-        self.jugador_actual_id = self.jugadores.index(jugador)
+    def procesar_jugada(self, opcion_juego: OpcionesJuego, apuesta_actual: Tuple[int, int], opcion_dudo_especial: Optional[
+        OpcionesDudoEspecial] = None):
+        """Procesa la jugada del jugador actual según la opción elegida.
 
-    def procesar_jugada(self, opcion_juego: OpcionesJuego, apuesta_actual: Tuple[int, int], opcion_dudo_especial: Optional[OpcionesDudoEspecial] = None):
+        Args:
+            opcion_juego (OpcionesJuego): Tipo de jugada (apuesto, dudo, calzo).
+            apuesta_actual (tuple[int, int]): Apuesta realizada.
+            opcion_dudo_especial (OpcionesDudoEspecial, optional):
+                Variante especial de dudo.
+        """
         validador_apuesta = ValidadorApuesta()
         total_dados_en_juego = sum(jugador.total_de_dados_en_juego() for jugador in self.jugadores)
         jugador_actual = self.jugadores[self.jugador_actual_id]
@@ -70,11 +84,61 @@ class ArbitroRonda:
             self._resolver_calzo(jugador_actual)
 
     def es_jugador_con_un_dado(self):
+        """Verifica si el jugador actual tiene un único dado.
+
+        Returns:
+            bool: True si tiene un dado, False en caso contrario.
+        """
         jugador_actual = self.jugadores[self.jugador_actual_id]
         return jugador_actual.total_de_dados_en_juego() == 1
 
     def reiniciar_ronda(self):
+        """Reinicia el estado de la ronda, limpiando la apuesta previa."""
         self.apuesta_anterior = None
+
+    def iniciar_ronda(self):
+        """Configura el inicio de ronda en caso de jugadores con un dado."""
+        for jugador_id, jugador in enumerate(self.jugadores):
+            if jugador.total_de_dados_en_juego() == 1 and not jugador.ya_tuvo_ronda_especial:
+                self.jugador_actual_id = jugador_id
+                jugador.ya_tuvo_ronda_especial = True # aqui sabemos que tuvo su ronda especial
+                return
+
+    def dudo_abierto_resuelve(self):
+        """Resuelve la variante de dudo abierto para el jugador actual."""
+        jugador_actual = self.jugadores[self.jugador_actual_id]
+
+        #asumimos que el jugador tiene un solo dado y accedemos a esa posicion
+        resultado_dado = jugador_actual.cacho.resultados_numericos[0]
+
+        valor_apuesta = self.apuesta_anterior[1]
+
+        if resultado_dado ==valor_apuesta:
+            jugador_actual.ganar_dado()
+        else:
+            jugador_actual.perder_dado()
+
+    def dudo_cerrado_resuelve(self):
+        """Resuelve la variante de dudo cerrado para el jugador actual."""
+        jugador_actual = self.jugadores[self.jugador_actual_id]
+
+        # Obtenemos la cantidad real de dados usando el método ya probado
+        cantidad_real = self.definir_ganador(self.apuesta_anterior)
+
+        cantidad_apuesta = self.apuesta_anterior[0]
+
+        if cantidad_real < cantidad_apuesta:
+            jugador_actual.ganar_dado()
+        else:
+            jugador_actual.perder_dado()
+
+    def _siguiente_jugador(self):
+        self.jugador_actual_id = (self.jugador_actual_id + self.rotacion.value) % self.cantidad_jugadores
+
+    def _setear_inicio_ronda(self, jugador: Jugador):
+        if jugador not in self.jugadores:
+            raise ValueError("El jugador no pertenece a esta ronda")
+        self.jugador_actual_id = self.jugadores.index(jugador)
 
     def _resolver_calzo(self, jugador_actual: Jugador):
         cantidad_real = self.definir_ganador(self.apuesta_anterior)
@@ -86,14 +150,15 @@ class ArbitroRonda:
             jugador_actual.perder_dado()
             self._setear_inicio_ronda(jugador_actual)
 
-    def _resolver_dudo(self, jugador_actual: Jugador, jugador_anterior: Jugador, opcion_dudo_especial: Optional[OpcionesDudoEspecial] = None):
-        
+    def _resolver_dudo(self, jugador_actual: Jugador, jugador_anterior: Jugador, opcion_dudo_especial: Optional[
+        OpcionesDudoEspecial] = None):
+
         if self.es_jugador_con_un_dado() and opcion_dudo_especial:
             if opcion_dudo_especial == OpcionesDudoEspecial.ABIERTO:
                 self.dudo_abierto_resuelve()
             elif opcion_dudo_especial == OpcionesDudoEspecial.CERRADO:
                 self.dudo_cerrado_resuelve()
-        else:          
+        else:
             cantidad_real = self.definir_ganador(self.apuesta_anterior)
             dudo_fue_correcto = cantidad_real < self.apuesta_anterior[0]
             if dudo_fue_correcto:
@@ -113,36 +178,3 @@ class ArbitroRonda:
         if es_valido:
             self.apuesta_anterior = apuesta_actual
             self._siguiente_jugador()
-
-    def iniciar_ronda(self):
-        for jugador_id, jugador in enumerate(self.jugadores):
-            if jugador.total_de_dados_en_juego() == 1 and not jugador.ya_tuvo_ronda_especial: 
-                self.jugador_actual_id = jugador_id
-                jugador.ya_tuvo_ronda_especial = True # aqui sabemos que tuvo su ronda especial
-                return
-            
-    def dudo_abierto_resuelve(self):
-        jugador_actual = self.jugadores[self.jugador_actual_id]
-
-        #asumimos que el jugador tiene un solo dado y accedemos a esa posicion
-        resultado_dado = jugador_actual.cacho.resultados_numericos[0]
-
-        valor_apuesta = self.apuesta_anterior[1]
-
-        if resultado_dado ==valor_apuesta:
-            jugador_actual.ganar_dado()
-        else:
-            jugador_actual.perder_dado()
-
-    def dudo_cerrado_resuelve(self):
-        jugador_actual = self.jugadores[self.jugador_actual_id]
-
-        # Obtenemos la cantidad real de dados usando el método ya probado
-        cantidad_real = self.definir_ganador(self.apuesta_anterior)
-
-        cantidad_apuesta = self.apuesta_anterior[0]
-
-        if cantidad_real < cantidad_apuesta:
-            jugador_actual.ganar_dado()
-        else:
-            jugador_actual.perder_dado()

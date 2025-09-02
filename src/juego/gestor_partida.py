@@ -1,5 +1,8 @@
 from src.juego.jugador import Jugador
-from src.juego.arbitro_ronda import ArbitroRonda, Rotacion, OpcionesJuego
+from src.juego.arbitro_ronda import ArbitroRonda
+from src.juego.enums import OpcionesJuego, Rotacion
+
+
 class GestorPartida:
 
     def __init__(self, cantidad_jugadores: int):

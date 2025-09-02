@@ -2,7 +2,7 @@ import pytest
 import src.juego.arbitro_ronda as modulo_arbitro
 
 from src.juego.gestor_partida import GestorPartida
-from src.juego.arbitro_ronda import OpcionesJuego, Rotacion
+from src.juego.enums import OpcionesJuego, Rotacion
 from src.juego.jugador import Jugador
 from src.servicios.desiciones_simuladas import ProveedorScripted
 
