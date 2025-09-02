@@ -99,3 +99,8 @@ class ArbitroRonda:
         if es_valido:
             self.apuesta_anterior = apuesta_actual
             self._siguiente_jugador()
+    def iniciar_ronda(self):
+        for jugador_id, jugador in enumerate(self.jugadores):
+            if jugador.total_de_dados_en_juego() == 1:
+                self.jugador_actual_id = jugador_id
+                return
