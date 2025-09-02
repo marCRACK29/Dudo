@@ -1,8 +1,9 @@
 from .dado import Dado
 
 class Cacho:
+    MAX_DADOS = 5
     def __init__(self):
-        self._dados = [Dado() for _ in range(5)]
+        self._dados = [Dado() for _ in range(self.MAX_DADOS)]
     
     def agitar(self) -> str:
         for dado in self._dados:
@@ -21,7 +22,7 @@ class Cacho:
         raise ValueError("No quedan dados. Jugador fuera.")
     
     def gana_dado(self, dado: Dado) -> str:
-        if len(self._dados) >= 5:
+        if len(self._dados) >= self.MAX_DADOS:
             raise ValueError("Límite de 5 dados alcanzado. Dejar dado en depósito del jugador.")
         else:
             self._dados.append(dado)

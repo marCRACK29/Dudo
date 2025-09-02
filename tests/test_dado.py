@@ -26,7 +26,7 @@ def test_get_pinta(mocker, numero, pinta_esperada):
 
     dado_prueba = Dado(mock_prueba)
     dado_prueba.tirar()
-    resultado = dado_prueba.get_pinta
+    resultado = dado_prueba.pinta
 
     assert resultado == pinta_esperada
 
@@ -49,7 +49,7 @@ def test_pinta_sin_tirar():
     dado_prueba = Dado()
     
     with pytest.raises(ValueError, match="El dado aún no ha sido tirado."):
-        dado_prueba.get_pinta()
+        dado_prueba.pinta()
 
 def test_ultimo_resultado_sin_tirar():
     dado_prueba = Dado()
