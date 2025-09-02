@@ -5,7 +5,7 @@ class ValidadorApuesta:
     def es_apuesta_valida(
         self,
         apuesta: Apuesta,
-        apuesta_anterior: Apuesta,
+        apuesta_anterior: Apuesta | None,
         total_dados: int
     ) -> tuple[bool, str]:
         if not self._es_numero_valido(apuesta):
@@ -23,11 +23,14 @@ class ValidadorApuesta:
         return 1 <= apuesta[0] <= total_dados
     
     def _es_mayor_a_la_anterior(self, apuesta_actual: Apuesta, apuesta_anterior: Apuesta) -> bool:
-        if apuesta_actual[1] == apuesta_anterior[1]: # misma pinta 
+        if apuesta_anterior is None:
+            return True
+        if apuesta_actual[1] == apuesta_anterior[1]: # misma pinta
             return apuesta_actual[0] > apuesta_anterior[0] # los números deben respetar la jerarquia
-        else: #pintas distintas
-            if apuesta_actual[0] >= apuesta_anterior[0]: # 3 cuadras y 3 quintas seria un ejemplo válido
-                return apuesta_actual[1] > apuesta_anterior[1] # entonces las pintas deben respetar jerarquia
-            else: #pintas distintas, pero no respeta la jerarquia de números
-                #ej: (cuatro quintas) y luego (dos sextas) -> respeta pintas, pero no numeros
-                return False
+
+        if apuesta_actual[0] >= apuesta_anterior[0]: # 3 cuadras y 3 quintas seria un ejemplo válido
+            return apuesta_actual[1] > apuesta_anterior[1] # entonces las pintas deben respetar jerarquia
+
+        #pintas distintas, pero no respeta la jerarquia de números
+        #ej: (cuatro quintas) y luego (dos sextas) -> respeta pintas, pero no numeros
+        return False
