@@ -1,6 +1,6 @@
 import pytest
 
-from src.juego.arbitro_ronda import ArbitroRonda, Rotacion, OpcionesJuego
+from src.juego.arbitro_ronda import ArbitroRonda, Rotacion, OpcionesJuego, OpcionesDudoEspecial
 from src.juego.jugador import Jugador
 from src.juego.validador_apuesta import ValidadorApuesta
 
@@ -343,3 +343,36 @@ def test_jugador_con_un_dado_obtiene_turno_especial_solo_una_vez(
     
     # Verificamos que el turno se asigna correctamente
     assert arbitro.jugador_actual_id == turno_esperado
+
+
+@pytest.mark.parametrize(
+    "opcion_especial, metodo_esperado",
+    [
+        (OpcionesDudoEspecial.ABIERTO, 'dudo_abierto_resuelve'),
+        (OpcionesDudoEspecial.CERRADO, 'dudo_cerrado_resuelve')
+    ]
+)
+def test_arbitro_con_un_dado_procesa_dudo_especial(
+    opcion_especial, metodo_esperado, mocker
+):
+    # Creamos un jugador con un solo dado
+    jugador_con_un_dado = Jugador()
+    arbitro = ArbitroRonda(0, [jugador_con_un_dado])
+    
+    # Mockeamos el metodo que verifica si tiene un dado
+    mocker.patch.object(arbitro, 'es_jugador_con_un_dado', return_value=True)
+    
+    # Mockeamos los métodos de resolución que vamos a crear
+    mock_dudo_abierto = mocker.patch.object(arbitro, 'dudo_abierto_resuelve')
+    mock_dudo_cerrado = mocker.patch.object(arbitro, 'dudo_cerrado_resuelve')
+    
+    # Llamamos a procesar_jugada con la opción especial
+    arbitro.procesar_jugada(OpcionesJuego.DUDO, None, opcion_dudo_especial=opcion_especial)
+    
+    # Verificamos que el método esperado fue llamado y viceversa, ademas de que si fue llamado uno, no fue llamado el otro
+    if metodo_esperado == 'dudo_abierto_resuelve':
+        mock_dudo_abierto.assert_called_once()
+        mock_dudo_cerrado.assert_not_called()
+    else:
+        mock_dudo_cerrado.assert_called_once()
+        mock_dudo_abierto.assert_not_called()
