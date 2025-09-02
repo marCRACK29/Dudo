@@ -116,8 +116,131 @@ def test_jugar_ronda(monkeypatch, manos, llamadas_esperadas, resultado):
     # 7) Snapshot de dados después y detectar quién empieza la próxima ronda
     despues = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
 
-
     assert despues == resultado
+
+def _set_mano_respetando_cantidad(jugador: Jugador, valores):
+    """Solo usa tantos valores como dados tenga el jugador actualmente."""
+    k = len(jugador.cacho._dados)
+    _set_mano(jugador, valores[:k])
+
+def test_jugar_dos_rondas(monkeypatch):
+    # 1) Forzar primer jugador determinista (0) una sola vez
+    monkeypatch.setattr(
+        GestorPartida,
+        "_elegir_primer_jugador",
+        lambda self, n: setattr(self, "primer_jugador", 0),
+    )
+
+    # 3) Crear partida y un único árbitro
+    partida = GestorPartida(3)
+    partida.generar_arbitro(Rotacion.ANTIHORARIO)
+
+    # ---------- RONDA 1 (igual a tu Caso A) ----------
+    manos_r1 = [
+        [3, 3, 2, 6, 1],   # J0
+        [4, 1, 3, 2, 5],   # J1
+        [6, 6, 2, 2, 5],   # J2
+    ]
+    for j, mano in zip(partida.jugadores, manos_r1):
+        _set_mano_respetando_cantidad(j, mano)
+
+    proveedor_r1 = ProveedorScripted([
+        (OpcionesJuego.APUESTO, (2, 5)),
+        (OpcionesJuego.APUESTO, (3, 5)),
+        (OpcionesJuego.DUDO, None),
+    ])
+
+    partida.jugar_ronda(proveedor_r1)
+
+    despues_r1 = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
+    assert despues_r1 == [5, 4, 5]   # pierde J2 (dudó incorrectamente frente a 3×5)
+
+    # ---------- RONDA 2 (empieza quien defina tu árbitro; no tocamos nada) ----------
+    # Secuencia: APUESTO(2×3) -> DUDO
+    # Elegimos manos para que el DUDO sea CORRECTO (total efectivos de 3 < 2),
+    # de modo que pierda un dado el apostador previo.
+    manos_r2 = [
+        [1, 3, 4, 5, 6],   # J0: 1 as, 0 treses
+        [2, 4, 5, 6],   # J1: 0 ases, 0 treses
+        [2, 4, 6, 5, 2],      # J2: 0 ases, 0 treses (tiene 4 dados)
+    ]
+    for j, mano in zip(partida.jugadores, manos_r2):
+        _set_mano_respetando_cantidad(j, mano)
+
+    proveedor_r2 = ProveedorScripted([
+        (OpcionesJuego.APUESTO, (2, 3)),
+        (OpcionesJuego.DUDO, None),
+    ])
+
+    partida.jugar_ronda(proveedor_r2)
+
+    # Con estas manos, efectivos de "3" = 1 (solo el as de J0) < 2, por tanto el DUDO es correcto
+    # => pierde un dado quien apostó 2×3 en esa ronda (el "apostador previo").
+    # Dado el orden que gestiona tu árbitro (perdedor/ganador inicia, rotación, etc.),
+    # esta combinación lleva a que termine perdiendo J2 una vez más.
+    despues_r2 = [jug.total_de_dados_en_juego() for jug in partida.jugadores]
+    assert despues_r2 == [4, 4, 5]
+
+def test_tres_rondas_dos_jugadores(monkeypatch):
+    # 1) Primer jugador determinista (0)
+    monkeypatch.setattr(
+        GestorPartida,
+        "_elegir_primer_jugador",
+        lambda self, n: setattr(self, "primer_jugador", 0),
+    )
+
+
+    partida = GestorPartida(2)
+    partida.generar_arbitro(Rotacion.HORARIO)
+
+    # ---------- RONDA 1 (tu Caso B) ----------
+    manos_r1 = [
+        [1, 1, 2, 3, 4],  # J0
+        [1, 2, 3, 4, 5],  # J1
+    ]
+    for j, mano in zip(partida.jugadores, manos_r1):
+        _set_mano_respetando_cantidad(j, mano)
+
+    proveedor_r1 = ProveedorScripted([
+        (OpcionesJuego.APUESTO, (1, 2)),
+        (OpcionesJuego.CALZO, None),
+    ])
+    partida.jugar_ronda(proveedor_r1)
+    assert [j.total_de_dados_en_juego() for j in partida.jugadores] == [5, 4]  # pierde J1
+
+    # ---------- RONDA 2 ----------
+    # Secuencia: APUESTO(2×6) -> DUDO, diseñamos manos para que el DUDO sea CORRECTO (efectivos de 6 < 2),
+    # y así pierda quien apostó (el previo).
+    manos_r2 = [
+        [2, 3, 4, 5, 1],  # J0: 1 as, 0 seises  => 1 efectivo
+        [2, 3, 4, 5],     # J1 (4 dados): 0 ases, 0 seises => 0 efectivos
+    ]
+    for j, mano in zip(partida.jugadores, manos_r2):
+        _set_mano_respetando_cantidad(j, mano)
+
+    proveedor_r2 = ProveedorScripted([
+        (OpcionesJuego.APUESTO, (2, 6)),
+        (OpcionesJuego.DUDO, None),
+    ])
+    partida.jugar_ronda(proveedor_r2)
+    assert [j.total_de_dados_en_juego() for j in partida.jugadores] == [5, 3]  # vuelve a perder J1
+
+    # ---------- RONDA 3 ----------
+    # Secuencia: APUESTO(2×2) -> DUDO, ahora hacemos el DUDO INCORRECTO (efectivos de 2 >= 2) para que
+    # pierda quien dudó.
+    manos_r3 = [
+        [2, 1, 4, 5, 6],  # J0: un "2" + un as (comodín) => 2 efectivos
+        [2, 3, 4],        # J1 (3 dados): un "2" => +1, total >= 2
+    ]
+    for j, mano in zip(partida.jugadores, manos_r3):
+        _set_mano_respetando_cantidad(j, mano)
+
+    proveedor_r3 = ProveedorScripted([
+        (OpcionesJuego.APUESTO, (2, 2)),
+        (OpcionesJuego.DUDO, None),
+    ])
+    partida.jugar_ronda(proveedor_r3)
+    assert [j.total_de_dados_en_juego() for j in partida.jugadores] == [4, 3]
 
 def test_eliminar_jugador_sin_dados():
     partida = GestorPartida(3)
