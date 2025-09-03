@@ -86,15 +86,15 @@ def test_seis_jugadores_lanzan_controlado(mocker, datos_lanzamientos, resultado)
             # Apuesta anterior fue (3,5) -> DUDO es INCORRECTO si total >= 3, por lo tanto J2 pierde un dado
             [5, 5, 4],
         ),
-        # Caso B: J0 apuesta (1,1) -> J1 CALZO
+        # Caso B: J0 apuesta (6,2) -> J1 CALZO
         (
             [[1, 1, 2, 3, 4],  # J0
              [1, 2, 3, 4, 5]], # J1
             [
-                (OpcionesJuego.APUESTO, (1, 2)),
+                (OpcionesJuego.APUESTO, (6, 2)),
                 (OpcionesJuego.CALZO, None),
             ],
-            # Contar 1s exactos = 3; calzo con apuesta=1 es INCORRECTO, J1 pierde un dado
+            # Contar 1s exactos = 3; calzo con apuesta = 6 es INCORRECTO, J1 pierde un dado
             [5, 4],
         ),
     ],
@@ -202,7 +202,7 @@ def test_tres_rondas_dos_jugadores(monkeypatch):
         _set_mano_respetando_cantidad(j, mano)
 
     proveedor_r1 = ProveedorScripted([
-        (OpcionesJuego.APUESTO, (1, 2)),
+        (OpcionesJuego.APUESTO, (6, 2)),
         (OpcionesJuego.CALZO, None),
     ])
     partida.jugar_ronda(proveedor_r1)
