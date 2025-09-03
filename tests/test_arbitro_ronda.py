@@ -465,4 +465,19 @@ def test_dudo_cerrado_resuelve_correctamente(
         mock_perder.assert_called_once()
         mock_ganar.assert_not_called()
 
-        
+
+def test_resolver_calzo_lanza_error_si_cantidad_es_menor_a_la_mitad(mocker):
+    # Asume una partida con 3 jugadores, 15 dados en total.
+    # La mitad de 15 es 7.5. La apuesta de calzoo por 7 o menos dados debería ser inválida
+    
+    jugador_con_muchos_dados = Jugador()
+    jugador_con_muchos_dados.dados_calzados.extend([mocker.Mock() for _ in range(15)])
+    
+    jugadores_prueba = [Jugador() for _ in range(3)]
+    arbitro = ArbitroRonda(0, jugadores_prueba)
+    
+    # Simula una apuesta de calzo con menos de la mitad de los dados (7 dados)
+    arbitro.apuesta_anterior = (7, 5) # 7 quinas
+    
+    with pytest.raises(ValueError, match="El calzo debe ser al menos la mitad de los dados en juego"):
+        arbitro._resolver_calzo(jugador_con_muchos_dados)        
