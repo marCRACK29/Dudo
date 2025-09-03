@@ -9,6 +9,17 @@ class ValidadorApuesta:
         total_dados: int, 
         jugador_con_un_dado: bool = False
     ) -> tuple[bool, str]:
+        """Valida si una apuesta cumple las reglas del juego.
+
+               Args:
+                   apuesta (Apuesta): Apuesta actual (cantidad, pinta).
+                   apuesta_anterior (Apuesta | None): Apuesta previa o None si es la primera.
+                   total_dados (int): Cantidad total de dados en juego.
+                   jugador_con_un_dado (bool, optional): Indica si el jugador tiene un dado.
+
+               Returns:
+                   tuple[bool, str]: True y mensaje si es válida, False y motivo si no.
+               """
         if apuesta_anterior is None and apuesta[1] == 1:
             if not jugador_con_un_dado:
                 return False, "No puedes comenzar apostando con as si tienes más de un dado"
@@ -29,12 +40,15 @@ class ValidadorApuesta:
         return True, "OK"
     
     def _es_numero_valido(self, apuesta: Apuesta) -> bool:
+        """Verifica que la pinta esté entre 1 y 6."""
         return 1 <= apuesta[1] <= 6
     
     def _es_cantidad_posible(self, apuesta: Apuesta, total_dados: int) -> bool:
+        """Verifica que la cantidad esté dentro de los dados en juego."""
         return 1 <= apuesta[0] <= total_dados
     
     def _es_mayor_a_la_anterior(self, apuesta_actual: Apuesta, apuesta_anterior: Apuesta) -> bool:
+        """Comprueba si la apuesta actual supera a la anterior según jerarquía."""
         if apuesta_anterior is None:
             return True
         if apuesta_actual[1] == apuesta_anterior[1]: # misma pinta
@@ -48,6 +62,7 @@ class ValidadorApuesta:
         return False
     
     def _cambiar_a_ases(self, apuesta_actual, apuesta_anterior) -> bool:
+        """Valida el cambio de pintas normales a ases según las reglas."""
         res = apuesta_anterior[0]//2 + 1
         if res == apuesta_actual[0]: 
             return True
@@ -55,6 +70,7 @@ class ValidadorApuesta:
             return False
         
     def _cambiar_de_ases(self, apuesta_actual, apuesta_anterior) -> bool:
+        """Valida el cambio de ases a pintas normales según las reglas."""
         res = apuesta_anterior[0]*2 + 1
         if res == apuesta_actual[0]:
             return True
