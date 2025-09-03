@@ -139,10 +139,17 @@ class ArbitroRonda:
         if jugador not in self.jugadores:
             raise ValueError("El jugador no pertenece a esta ronda")
         self.jugador_actual_id = self.jugadores.index(jugador)
+    def _resolver_calzo(self, jugador_actual: Jugador):       
+        
+        apuesta_anterior = self.apuesta_anterior
+        total_dados_en_juego = sum(j.total_de_dados_en_juego() for j in self.jugadores)
 
-    def _resolver_calzo(self, jugador_actual: Jugador):
-        cantidad_real = self.definir_ganador(self.apuesta_anterior)
-        calzo_fue_correcto = cantidad_real == self.apuesta_anterior[0]
+        if apuesta_anterior[0] < (total_dados_en_juego / 2):
+            raise ValueError("El calzo debe ser con al menos la mitad de los dados en juego")
+
+        cantidad_real = self.definir_ganador(apuesta_anterior)
+        calzo_fue_correcto = cantidad_real == apuesta_anterior[0]
+        
         if calzo_fue_correcto:
             jugador_actual.ganar_dado()
             self._setear_inicio_ronda(jugador_actual)
@@ -178,3 +185,4 @@ class ArbitroRonda:
         if es_valido:
             self.apuesta_anterior = apuesta_actual
             self._siguiente_jugador()
+
