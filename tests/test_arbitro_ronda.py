@@ -479,5 +479,5 @@ def test_resolver_calzo_lanza_error_si_cantidad_es_menor_a_la_mitad(mocker):
     # Simula una apuesta de calzo con menos de la mitad de los dados (7 dados)
     arbitro.apuesta_anterior = (7, 5) # 7 quinas
     
-    with pytest.raises(ValueError, match="El calzo debe ser al menos la mitad de los dados en juego"):
+    with pytest.raises(ValueError, match="El calzo debe ser con al menos la mitad de los dados en juego"):
         arbitro._resolver_calzo(jugador_con_muchos_dados)        
